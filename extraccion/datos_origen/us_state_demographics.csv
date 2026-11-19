@@ -1,0 +1,52 @@
+State,State_Name,Region,Population_2023,Area_SqMi,Density_Per_SqMi
+AL,Alabama,South,5108468,50645,100.87
+AK,Alaska,West,733406,570641,1.29
+AZ,Arizona,West,7431344,113594,65.42
+AR,Arkansas,South,3067732,52035,58.96
+CA,California,West,38965193,155779,250.13
+CO,Colorado,West,5877610,103642,56.71
+CT,Connecticut,Northeast,3617176,4842,747.04
+DE,Delaware,South,1031890,1949,529.45
+DC,District of Columbia,South,678972,61,11130.69
+FL,Florida,South,22610726,53625,421.65
+GA,Georgia,South,11029227,57513,191.77
+HI,Hawaii,West,1435138,6423,223.44
+ID,Idaho,West,1964726,82643,23.77
+IL,Illinois,Midwest,12549689,55519,226.04
+IN,Indiana,Midwest,6862199,35826,191.54
+IA,Iowa,Midwest,3207004,55857,57.41
+KS,Kansas,Midwest,2940546,81759,35.97
+KY,Kentucky,South,4526154,39486,114.63
+LA,Louisiana,South,4573749,43204,105.86
+ME,Maine,Northeast,1395722,30843,45.25
+MD,Maryland,South,6180253,9707,636.68
+MA,Massachusetts,Northeast,7001399,7800,897.62
+MI,Michigan,Midwest,10037261,56539,177.53
+MN,Minnesota,Midwest,5737915,79627,72.06
+MS,Mississippi,South,2939690,46923,62.65
+MO,Missouri,Midwest,6196156,68742,90.14
+MT,Montana,West,1132812,145546,7.78
+NE,Nebraska,Midwest,1978379,76824,25.75
+NV,Nevada,West,3194176,109781,29.10
+NH,New Hampshire,Northeast,1402054,8953,156.60
+NJ,New Jersey,Northeast,9290841,7354,1263.37
+NM,New Mexico,West,2114371,121298,17.43
+NY,New York,Northeast,19571216,47126,415.30
+NC,North Carolina,South,10835491,48618,222.87
+ND,North Dakota,Midwest,783926,69001,11.36
+OH,Ohio,Midwest,11785935,40861,288.44
+OK,Oklahoma,South,4053824,68595,59.10
+OR,Oregon,West,4233358,95988,44.10
+PA,Pennsylvania,Northeast,12961683,44743,289.69
+RI,Rhode Island,Northeast,1095962,1034,1059.92
+SC,South Carolina,South,5373555,30061,178.76
+SD,South Dakota,Midwest,919318,75811,12.13
+TN,Tennessee,South,7126489,41235,172.83
+TX,Texas,South,30503301,261232,116.77
+UT,Utah,West,3417734,82170,41.59
+VT,Vermont,Northeast,647464,9217,70.25
+VA,Virginia,South,8715698,39490,220.71
+WA,Washington,West,7812880,66456,117.56
+WV,West Virginia,South,1770071,24038,73.64
+WI,Wisconsin,Midwest,5910955,54158,109.14
+WY,Wyoming,West,584057,97093,6.02

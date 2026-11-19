@@ -1,0 +1,15 @@
+{
+  "total_raw_rows": 7728394,
+  "total_clean_rows": 7728394,
+  "duplicates_removed": 0,
+  "dotted_timestamps_fixed": 743166,
+  "invalid_timestamps": 0,
+  "negative_durations": 0,
+  "outliers_gt_24h": 34981,
+  "nulls_street": 10869,
+  "nulls_city": 253,
+  "nulls_weather": 173459,
+  "nulls_temperature": 163853,
+  "nulls_visibility": 177098,
+  "elapsed_seconds": 950.87
+}

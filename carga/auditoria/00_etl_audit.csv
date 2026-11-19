@@ -1,0 +1,2 @@
+total_raw_rows,total_clean_rows,duplicates_removed,dotted_timestamps_fixed,invalid_timestamps,negative_durations,outliers_gt_24h,nulls_street,nulls_city,nulls_weather,nulls_temperature,nulls_visibility,elapsed_seconds
+7728394,7728394,0,743166,0,0,34981,10869,253,173459,163853,177098,950.87
