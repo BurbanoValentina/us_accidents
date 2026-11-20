@@ -25,3 +25,5 @@ derby.log
 # Temporales de sistema operativo
 .DS_Store
 Thumbs.db
+.firebase/
+
