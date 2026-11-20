@@ -1,8 +1,6 @@
 # ⚙️ Pipeline ETL: Análisis de Accidentes de Tránsito en Zonas Urbanas (EE.UU., 2016–2023)
 
-Repositorio exclusivo y especializado en el proceso de **Extracción, Transformación y Carga (ETL)** para el dataset masivo de accidentes viales de Estados Unidos (**7,728,394 registros** de [Kaggle US Accidents](https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents)) enriquecido con datos demográficos del **Censo de EE.UU. 2023**.
-
-Todo el frontend, diapositivas, documentos y tableros externos han sido removidos, dejando una **arquitectura de datos limpia, modular y de alto rendimiento**.
+Repositorio exclusivo y especializado en el proceso de **Extracción, Transformación y Carga (ETL)** para el dataset masivo de accidentes viales de Estados Unidos (**7,728,394 registros** de [Kaggle US Accidents](https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents)).
 
 ---
 
@@ -12,24 +10,22 @@ Todo el frontend, diapositivas, documentos y tableros externos han sido removido
 tallerpyspark/
 ├── 1. extraccion/                       # FASE 1: INGESTA Y EXTRACCIÓN CONTROLADA
 │   ├── datos_origen/                    # Fuentes de datos crudas en bruto
-│   │   ├── US_Accidents_March23.csv     # Dataset crudo original (7,728,394 filas, 3.05 GB)
-│   │   └── us_state_demographics.csv    # Tabla demográfica del Censo EE.UU. 2023
-│   ├── extractor.py                     # Extractor en streaming con Pandas (bloques de 500k)
-│   ├── extractor_pyspark.py             # Extractor distribuido PySpark con esquema tipado (StructType)
+│   │   └── US_Accidents_March23.csv     # Dataset crudo original (7,728,394 filas, 3.05 GB)
+│   ├── extractor.py                     # Extractor ÚNICO: descarga desde Kaggle y streaming con Pandas
 │   └── README.md                        # Documentación técnica de la fase de extracción
 │
 ├── 2. transformacion/                   # FASE 2: LIMPIEZA, DERIVACIÓN Y ENRIQUECIMIENTO
 │   ├── transformador.py                 # Lógica de limpieza, regex RE2 C++, NLP y enriquecimiento
-│   ├── transformador_pyspark.py         # Transformaciones distribuidas en Spark SQL y Broadcast Join
+│   ├── transformador_pyspark.py         # Transformaciones distribuidas en Spark SQL
 │   └── README.md                        # Documentación técnica de la fase de transformación
 │
 ├── 3. carga/                            # FASE 3: ALMACENAMIENTO, INDEXACIÓN Y AUDITORÍA
 │   ├── almacenamiento_parquet/          # Almacenamiento columnar optimizado
 │   │   └── us_accidents_clean.parquet   # Parquet limpio comprimido Snappy (~374 MB)
 │   ├── base_datos/                      # Base de datos relacional analítica
-│   │   └── us_accidents.db              # SQLite 3 con esquema estrella y 8 índices B-Tree (3.16 GB)
+│   │   └── us_accidents.db              # SQLite 3 con 8 índices B-Tree (3.16 GB)
 │   ├── sql/                             # Scripts DDL de base de datos
-│   │   └── esquema_sqlite.sql           # Definición formal de tablas e índices
+│   │   └── esquema_sqlite.sql           # Definición formal de tabla accidents e índices
 │   ├── auditoria/                       # Métricas de ejecución y calidad del dato
 │   │   ├── 00_etl_audit.json            # Métricas en JSON (filas, nulos, outliers, tiempos)
 │   │   └── 00_etl_audit.csv             # Métricas en formato tabular CSV
@@ -38,11 +34,11 @@ tallerpyspark/
 │
 ├── 4. csv_limpio_final/                 # APARTADO EXCLUSIVO: DATASET FINAL DEPURADO EN CSV
 │   ├── us_accidents_limpio.csv          # CSV LIMPIO FINAL COMPLETO (7.73M filas, 40 cols, 2.22 GB)
-│   ├── us_accidents_limpio_muestra_10k.csv # Muestra rápida de 10,000 filas para Excel / inspección
 │   └── README.md                        # Diccionario de datos formal de las 40 columnas
 │
+├── .venv/                               # Entorno virtual aislado de Python con todas las dependencias
 ├── ejecutar_etl.py                      # Orquestador maestro CLI del pipeline completo
-├── requirements.txt                     # Dependencias estrictas del ETL (Pandas, PyArrow, PySpark)
+├── requirements.txt                     # Dependencias estrictas del ETL (Pandas, PyArrow, PySpark, KaggleHub)
 └── .gitignore                           # Exclusión de archivos pesados binarios
 ```
 
@@ -52,16 +48,19 @@ tallerpyspark/
 
 ### 1. ¿Qué se utilizó para hacer la EXTRACCIÓN?
 
-La fase de extracción resolvió el desafío de ingerir un archivo CSV de **3.05 GB** con **7,728,394 filas** y 46 columnas sin desbordar la memoria RAM.
+La fase de extracción resuelve el desafío de descargar e ingerir el dataset de **3.05 GB** y **7,728,394 filas** de forma automática y controlada:
 
-* **Tecnología Principal:** **Python 3.13 + Pandas (`chunksize=500_000`, `low_memory=False`)**.
-  * **Patrón Streaming por Generadores:** En lugar de cargar los 3 GB en memoria de una sola vez, se implementó un generador en `extraccion/extractor.py` que lee bloques controlados de 500,000 registros, manteniendo el uso de memoria RAM por debajo de 1.5 GB en todo momento.
-  * **Filtrado Vertical de Columnas (`usecols`):** Se extrajeron exactamente 27 columnas críticas requeridas para el análisis, descartando campos redundantes en la lectura inicial y reduciendo en un 40% el tiempo de I/O de disco.
-* **Tecnología Alternativa:** **Apache Spark / PySpark 3.5+ (`extraccion/extractor_pyspark.py`)**.
-  * **Esquema Estructurado Explícito (`StructType` con 46 campos):** Se definió un esquema tipado exacto (`StringType`, `IntegerType`, `DoubleType`, `BooleanType`), anulando la necesidad de `inferSchema=True` (el cual requeriría dos pasadas completas sobre los 3 GB de datos crudos).
-* **Fuentes Extraídas (`extraccion/datos_origen/`):**
-  1. `US_Accidents_March23.csv`: Datos de telemetría de tráfico recopilados de múltiples proveedores (MapQuest, Bing).
-  2. `us_state_demographics.csv`: Datos oficiales del Censo de EE.UU. 2023 (población, superficie en millas cuadradas y densidad por estado).
+* **Descarga Automática desde Kaggle:**
+  * Se descarga directamente desde la URL oficial de Kaggle [`https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents`](https://www.kaggle.com/datasets/sobhanmoosavi/us-accidents) utilizando la librería `kagglehub` de forma anónima y desatendida.
+* **Extractor Único Centralizado (`extraccion/extractor.py`):**
+  * **Patrón Streaming por Generadores:** En lugar de cargar los 3.05 GB de una sola vez, lee bloques controlados de 500,000 registros con Pandas, manteniendo el uso de memoria RAM por debajo de 1.5 GB en todo momento.
+  * **Filtrado Vertical de Columnas (`usecols`):** Extrae exactamente 27 columnas requeridas para el análisis, reduciendo en un 40% el tiempo de I/O de disco.
+  * **Soporte PySpark Integrado (`extraer_spark`):** Permite ingesta distribuida con esquema fuertemente tipado (`StructType` con 46 campos) bajo demanda.
+  * **Patrón Streaming por Generadores:** En lugar de cargar los 3.05 GB (7,728,394 filas) de una sola vez, lee bloques de 500,000 registros, manteniendo el uso de memoria RAM por debajo de 1.5 GB.
+  * **Filtrado Vertical de Columnas (`usecols`):** Extrae 27 columnas críticas requeridas para el análisis, reduciendo en un 40% el tiempo de I/O de disco.
+* **Extractor Distribuido PySpark (`extraccion/extractor_pyspark.py`):**
+  * Reutiliza el extractor central para asegurar las descargas desde URL.
+  * **Esquema Estructurado Explícito (`StructType` con 46 campos):** Anula la necesidad de `inferSchema=True`, reduciendo drásticamente el tiempo de inicio sobre 3 GB.
 
 ---
 
@@ -170,12 +169,15 @@ python carga/cargador.py
 python ejecutar_etl.py --engine pyspark
 ```
 
-### 5. Responder las 10 Preguntas Analíticas con Consultas SQL en Python
+### 5. Consultas SQL y Respuestas Analíticas (Todo en `ejecutar_etl.py`)
+
+Todas las consultas SQL, preguntas analíticas y respuestas están **integradas directamente dentro de `ejecutar_etl.py`** sin depender de archivos externos:
 
 ```bash
-# Responder todas las 10 preguntas analíticas ejecutando SQL sobre us_accidents.db
-python ejecutar_etl.py --fase sql
+# Ejecutar y mostrar las 10 preguntas y respuestas con sus consultas SQL:
+python ejecutar_etl.py
 
-# Responder una pregunta analítica específica (ej. pregunta 1, 2, ..., 10)
-python ejecutar_etl.py --fase sql --pregunta 1
+# O responder una pregunta específica (del 1 al 10):
+python ejecutar_etl.py --pregunta 1
+python ejecutar_etl.py --pregunta 3
 ```

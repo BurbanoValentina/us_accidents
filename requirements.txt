@@ -1,6 +1,8 @@
-# Dependencias exclusivas para el Pipeline ETL
+# Dependencias del Pipeline ETL y Extracción Automática
 pandas>=2.2.0
 numpy>=1.26.0
 pyarrow>=18.0.0
 pyspark>=3.5.0
 SQLAlchemy>=2.0.0
+kagglehub>=0.3.0
+requests>=2.30.0

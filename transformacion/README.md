@@ -1,10 +1,10 @@
 # 🔄 Fase 2: Transformación, Limpieza y Enriquecimiento (ETL)
 
-Esta carpeta contiene todos los módulos y algoritmos responsables de la **Fase de Transformación** de los datos de accidentes de tránsito en EE.UU.
+Esta carpeta contiene el módulo único y unificado responsable de la **Fase de Transformación** de los datos de accidentes de tránsito en EE.UU.
 
 ---
 
-## 🛠️ Tecnologías y Métodos Utilizados
+## 🛠️ Tecnologías y Métodos Utilizados en `transformador.py`
 
 1. **Python 3.13 + Pandas 2.2+**:
    - Deduplicación global incremental por `ID` utilizando un conjunto de hash (`set()`) en memoria para garantizar unicidad a lo largo de todos los chunks.
@@ -14,14 +14,13 @@ Esta carpeta contiene todos los módulos y algoritmos responsables de la **Fase 
    - `pyarrow.compute.match_substring_regex`: Procesamiento ultra-rápido de expresiones regulares directamente sobre buffers de memoria C++, superando en más de 20x la velocidad del módulo `re` estándar de Python.
    - Clasificación semántica de más de 100 condiciones climáticas crudas en 6 categorías canónicas en español (`Despejado`, `Nublado`, `Lluvia`, `Niebla`, `Nieve/Hielo`, `Otro`).
    - Categorización jerárquica de tipos de vía en base al nombre de calle (`Autopista / Interstate`, `Carretera / Highway`, `Avenida / Boulevard`, `Calle / Vía Urbana`, `Otra Vía`).
-   - Minería de texto / NLP sobre el campo `Description` para clasificar 7 tipos de vehículos, incorporando filtros negativos para descartar falsos positivos toponímicos (por ejemplo: la línea de autobús o autopista `"I-80 Bus"`, avenidas como `"Van Ness Ave"` o `"Van Buren St"` que no corresponden a camionetas/vans).
+   - Minería de texto / NLP sobre el campo `Description` para clasificar 7 tipos de vehículos, incorporando filtros negativos para descartar falsos positivos toponímicos (por ejemplo: autopistas como `"I-80 Bus"`, avenidas como `"Van Ness Ave"` o `"Van Buren St"` que no corresponden a camionetas/vans).
 
 3. **NumPy (`np.select`)**:
    - Asignación condicional multivariable vectorizada para franjas horarias y variables derivadas, evitando bucles iterativos `for` o `apply()` lentos.
 
-4. **Apache Spark / PySpark**:
-   - Transformaciones nativas distribuidas con `pyspark.sql.functions` (`F.when`, `F.regexp_extract`, `F.to_timestamp`).
-   - **Broadcast Join**: Como la tabla demográfica de 51 estados es pequeña (2 KB), se utiliza `F.broadcast(df_demo)` para enviarla a todos los nodos de trabajo, evitando costosos *shuffles* por la red.
+4. **Soporte Distribuido PySpark Integrado (`transformar_spark`):**
+   - Transformaciones nativas equivalentes con `pyspark.sql.functions` (`F.when`, `F.regexp_extract`, `F.to_timestamp`) dentro del mismo archivo `transformador.py`.
 
 ---
 
@@ -43,6 +42,6 @@ Esta carpeta contiene todos los módulos y algoritmos responsables de la **Fase 
 ## 🚀 Cómo Ejecutar la Transformación Individualmente
 
 ```bash
-# Probar el transformador con datos simulados
+# Probar el módulo de transformación único
 python transformacion/transformador.py
 ```

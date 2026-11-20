@@ -6,10 +6,8 @@ Esta carpeta contiene el resultado final depurado, normalizado y enriquecido del
 
 ## 📁 Archivos Disponibles
 
-1. **`us_accidents_limpio.csv`** (2.22 GB):
-   - **Dataset completo final**: Contiene la totalidad de los **7,728,394 registros** y **40 columnas** procesadas, sin registros duplicados y con tipos de datos estandarizados.
-2. **`us_accidents_limpio_muestra_10k.csv`** (3.0 MB):
-   - **Muestra representativa de 10,000 filas**: Diseñada para apertura inmediata y exploración visual en Microsoft Excel, Google Sheets, VS Code o editores de texto sin requerir hardware de alta capacidad de memoria.
+1. **`us_accidents_limpio.csv`** (~2.22 GB):
+   - **Dataset completo final**: Contiene la totalidad de los **7,728,394 registros** y **40 columnas** procesadas, sin registros duplicados y con tipos de datos estandarizados. Listo para consumo analítico.
 
 ---
 

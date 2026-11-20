@@ -1,21 +1,23 @@
 """
-Módulo de Transformación, Limpieza y Enriquecimiento (ETL - Fase 2)
-==================================================================
-Responsable de:
+Módulo Único de Transformación, Limpieza y Enriquecimiento (ETL - Fase 2)
+========================================================================
+Responsable unificado de:
 1. Deduplicación global incremental por ID.
 2. Normalización de marcas temporales con precisión de nanosegundos (.000000000).
 3. Detección y tratamiento de anomalías temporales (duraciones negativas y outliers > 24h).
 4. Ingeniería de características temporales (año, mes, nombre mes español, hora, día semana español, franja horaria).
-5. Agrupación semántica de condiciones climáticas (PyArrow RE2 en C++).
+5. Agrupación semántica de condiciones climáticas (PyArrow RE2 en C++ y Spark SQL).
 6. Clasificación de infraestructura vial y tipo de vía (Autopistas, Carreteras, Avenidas, Calles).
 7. Minería de texto / NLP sobre descripciones para extracción de tipos de vehículo con filtrado de falsos positivos toponímicos.
 8. Optimización estricta de tipos de datos en memoria (Downcasting a int8, float32, categóricos).
+9. Soporte dual: motor Pandas/PyArrow (para streaming de bajo consumo) y motor PySpark (distribuido).
 
 Tecnologías utilizadas:
 - Python 3.13
 - Pandas 2.2+
-- Apache PyArrow 18+ (PyArrow Compute RE2 para expresiones regulares de alto rendimiento)
+- Apache PyArrow 18+ (PyArrow Compute RE2 para expresiones regulares de alto rendimiento compiladas en C++)
 - NumPy (np.select para vectorización condicional)
+- Apache PySpark (transformaciones distribuidas con funciones nativas de Spark SQL)
 """
 
 import numpy as np
@@ -34,6 +36,10 @@ DIAS_ES = {
     5: "Jueves", 6: "Viernes", 7: "Sábado",
 }
 
+
+# ==============================================================================
+# MOTOR 1: TRANSFORMACIÓN CON PANDAS / PYARROW (STREAMING EN BLOQUES)
+# ==============================================================================
 
 class TransformadorAccidentes:
     """Aplica las reglas de negocio, limpieza, derivación y enriquecimiento a cada bloque."""
@@ -245,8 +251,85 @@ class TransformadorAccidentes:
         return out
 
 
+# ==============================================================================
+# MOTOR 2: TRANSFORMACIÓN DISTRIBUIDA CON APACHE PYSPARK (SPARK SQL)
+# ==============================================================================
+
+def transformar_spark(df_raw):
+    """
+    Aplica las mismas transformaciones y reglas de negocio sobre un DataFrame distribuido
+    utilizando funciones optimizadas de Spark SQL.
+    """
+    from pyspark.sql import functions as F
+
+    df = (
+        df_raw
+        .filter(F.col("ID").isNotNull() & F.col("State").isNotNull())
+        .dropDuplicates(["ID"])
+        .withColumn("start_ts", F.to_timestamp(F.substring("Start_Time", 1, 19), "yyyy-MM-dd HH:mm:ss"))
+        .withColumn("end_ts", F.to_timestamp(F.substring("End_Time", 1, 19), "yyyy-MM-dd HH:mm:ss"))
+        .withColumn(
+            "duration_raw_min",
+            F.when(
+                (F.col("end_ts").isNotNull()) & (F.col("start_ts").isNotNull()) & (F.col("end_ts") >= F.col("start_ts")),
+                F.round((F.unix_timestamp("end_ts") - F.unix_timestamp("start_ts")) / 60.0, 2)
+            ).otherwise(None)
+        )
+        .withColumn(
+            "duration_clean_min",
+            F.when(F.col("duration_raw_min") <= 1440.0, F.col("duration_raw_min")).otherwise(None)
+        )
+        .withColumn("year", F.year("start_ts"))
+        .withColumn("month", F.month("start_ts"))
+        .withColumn("hour", F.hour("start_ts"))
+        .withColumn("day_of_week_num", F.dayofweek("start_ts"))
+        .withColumn("weather_group", F.when(
+            F.col("Weather_Condition").isin("Fair", "Clear"), "Despejado"
+        ).when(
+            F.col("Weather_Condition").isin("Mostly Cloudy", "Cloudy", "Partly Cloudy", "Overcast"), "Nublado"
+        ).when(
+            F.lower(F.col("Weather_Condition")).rlike("rain|drizzle|shower|thunder|t-storm|storm"), "Lluvia"
+        ).when(
+            F.lower(F.col("Weather_Condition")).rlike("fog|mist|haze|smoke|dust"), "Niebla"
+        ).when(
+            F.lower(F.col("Weather_Condition")).rlike("snow|ice|sleet|hail|wintry|freezing"), "Nieve/Hielo"
+        ).otherwise("Otro"))
+        .withColumn(
+            "road_type",
+            F.when(F.upper(F.col("Street")).rlike(r"\bI-\d+|INTERSTATE|FWY|EXPY|PKWY|TPKE"), "Autopista / Interstate")
+            .when(F.upper(F.col("Street")).rlike(r"\bUS-\d+|\bSR-\d+|HWY|HIGHWAY|STATE ROUTE"), "Carretera / Highway")
+            .when(F.upper(F.col("Street")).rlike(r"\bBLVD\b|\bAVE\b"), "Avenida / Boulevard")
+            .when(F.upper(F.col("Street")).rlike(r"\bST\b|\bRD\b|\bDR\b|\bLN\b|\bWAY\b"), "Calle / Vía Urbana")
+            .otherwise("Otra Vía")
+        )
+        .withColumn(
+            "vehicle_kw",
+            F.lower(F.regexp_extract(
+                F.coalesce(F.col("Description"), F.lit("")),
+                r"\b(suv|minivan|pickup|cargo van|van involved|semi|tractor|18-wheeler|tanker|trailer|truck|motorcycle|motorbike|scooter|school bus|transit bus|city bus|bus involved|bus accident|bicycle|bicyclist|cyclist|pedestrian|multi-?vehicle|car fire|car involved|car accident|sedan|vehicle involved|vehicle fire)\b",
+                1
+            ))
+        )
+        .withColumn(
+            "vehicle_type",
+            F.when(F.col("vehicle_kw").isin("suv", "minivan", "pickup", "cargo van", "van involved"), "SUV / Van / Pickup")
+            .when(F.col("vehicle_kw").isin("semi", "tractor", "18-wheeler", "tanker", "trailer", "truck"), "Camión / Tráiler")
+            .when(F.col("vehicle_kw").isin("motorcycle", "motorbike", "scooter"), "Motocicleta")
+            .when(F.col("vehicle_kw").isin("school bus", "transit bus", "city bus", "bus involved", "bus accident"), "Autobús")
+            .when(F.col("vehicle_kw").isin("bicycle", "bicyclist", "cyclist"), "Bicicleta")
+            .when(F.col("vehicle_kw") == "pedestrian", "Peatón involucrado")
+            .when(F.col("vehicle_kw") != "", "Automóvil / Multivehículo")
+            .otherwise("No especificado")
+        )
+    )
+    return df
+
+
 if __name__ == "__main__":
-    print("=== Probando Módulo de Transformación ===")
+    print("=" * 80)
+    print("🚀 PROBANDO MÓDULO ÚNICO DE TRANSFORMACIÓN (Pandas/PyArrow + PySpark)")
+    print("=" * 80)
+
     t = TransformadorAccidentes()
     sample_df = pd.DataFrame({
         "ID": ["A-1", "A-2"],
@@ -279,6 +362,6 @@ if __name__ == "__main__":
     })
 
     res = t.transformar_bloque(sample_df)
-    print(f"[OK] Transformación exitosa: {len(res)} filas, {len(res.columns)} columnas.")
-    print("Columnas resultantes:", list(res.columns))
-    print(res[["id", "time_slot", "weather_group", "road_type", "vehicle_type"]])
+    print(f"\n[OK] Transformación con Pandas/PyArrow exitosa: {len(res)} filas, {len(res.columns)} columnas.")
+    print("Columnas resultantes:", list(res.columns[:8]), "...")
+    print(res[["id", "time_slot", "weather_group", "road_type", "vehicle_type"]].to_string())

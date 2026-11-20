@@ -6,8 +6,8 @@ carga/base_datos/*.sqlite
 carga/almacenamiento_parquet/*.parquet
 csv_limpio_final/us_accidents_limpio.csv
 
-# Permitir muestra liviana en git
-!csv_limpio_final/us_accidents_limpio_muestra_10k.csv
+# Permitir README en git
+!csv_limpio_final/README.md
 
 # Entornos y cachés de Python / Spark
 __pycache__/
