@@ -5,6 +5,7 @@ carga/base_datos/*.db
 carga/base_datos/*.sqlite
 carga/almacenamiento_parquet/*.parquet
 csv_limpio_final/us_accidents_limpio.csv
+*.pbix
 
 # Permitir README en git
 !csv_limpio_final/README.md
