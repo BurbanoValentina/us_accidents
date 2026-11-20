@@ -1,0 +1,902 @@
+{
+  "q1": {
+    "states": [
+      {
+        "state": "CA",
+        "total": 1741433,
+        "avg_sev": 2.166,
+        "pct": 22.53
+      },
+      {
+        "state": "FL",
+        "total": 880192,
+        "avg_sev": 2.14,
+        "pct": 11.39
+      },
+      {
+        "state": "TX",
+        "total": 582837,
+        "avg_sev": 2.224,
+        "pct": 7.54
+      },
+      {
+        "state": "SC",
+        "total": 382557,
+        "avg_sev": 2.111,
+        "pct": 4.95
+      },
+      {
+        "state": "NY",
+        "total": 347960,
+        "avg_sev": 2.26,
+        "pct": 4.5
+      },
+      {
+        "state": "NC",
+        "total": 338199,
+        "avg_sev": 2.134,
+        "pct": 4.38
+      },
+      {
+        "state": "VA",
+        "total": 303301,
+        "avg_sev": 2.279,
+        "pct": 3.92
+      },
+      {
+        "state": "PA",
+        "total": 296620,
+        "avg_sev": 2.206,
+        "pct": 3.84
+      },
+      {
+        "state": "MN",
+        "total": 192084,
+        "avg_sev": 2.162,
+        "pct": 2.49
+      },
+      {
+        "state": "OR",
+        "total": 179660,
+        "avg_sev": 2.112,
+        "pct": 2.32
+      }
+    ],
+    "cities": [
+      {
+        "city": "Miami",
+        "state": "FL",
+        "total": 186768,
+        "avg_sev": 2.101,
+        "pct": 2.42
+      },
+      {
+        "city": "Houston",
+        "state": "TX",
+        "total": 169428,
+        "avg_sev": 2.183,
+        "pct": 2.19
+      },
+      {
+        "city": "Los Angeles",
+        "state": "CA",
+        "total": 156491,
+        "avg_sev": 2.234,
+        "pct": 2.02
+      },
+      {
+        "city": "Charlotte",
+        "state": "NC",
+        "total": 138345,
+        "avg_sev": 2.042,
+        "pct": 1.79
+      },
+      {
+        "city": "Dallas",
+        "state": "TX",
+        "total": 130303,
+        "avg_sev": 2.263,
+        "pct": 1.69
+      },
+      {
+        "city": "Orlando",
+        "state": "FL",
+        "total": 109690,
+        "avg_sev": 2.068,
+        "pct": 1.42
+      },
+      {
+        "city": "Austin",
+        "state": "TX",
+        "total": 96604,
+        "avg_sev": 2.089,
+        "pct": 1.25
+      },
+      {
+        "city": "Raleigh",
+        "state": "NC",
+        "total": 86066,
+        "avg_sev": 2.093,
+        "pct": 1.11
+      },
+      {
+        "city": "Nashville",
+        "state": "TN",
+        "total": 72670,
+        "avg_sev": 2.141,
+        "pct": 0.94
+      },
+      {
+        "city": "Baton Rouge",
+        "state": "LA",
+        "total": 71588,
+        "avg_sev": 2.083,
+        "pct": 0.93
+      }
+    ]
+  },
+  "q2": {
+    "by_hour": [
+      {
+        "hour": 0,
+        "total": 112378,
+        "avg_sev": 2.219,
+        "pct": 1.45
+      },
+      {
+        "hour": 1,
+        "total": 97071,
+        "avg_sev": 2.189,
+        "pct": 1.26
+      },
+      {
+        "hour": 2,
+        "total": 93227,
+        "avg_sev": 2.206,
+        "pct": 1.21
+      },
+      {
+        "hour": 3,
+        "total": 83863,
+        "avg_sev": 2.23,
+        "pct": 1.09
+      },
+      {
+        "hour": 4,
+        "total": 159852,
+        "avg_sev": 2.234,
+        "pct": 2.07
+      },
+      {
+        "hour": 5,
+        "total": 228182,
+        "avg_sev": 2.219,
+        "pct": 2.95
+      },
+      {
+        "hour": 6,
+        "total": 405837,
+        "avg_sev": 2.209,
+        "pct": 5.25
+      },
+      {
+        "hour": 7,
+        "total": 587472,
+        "avg_sev": 2.19,
+        "pct": 7.6
+      },
+      {
+        "hour": 8,
+        "total": 577576,
+        "avg_sev": 2.191,
+        "pct": 7.47
+      },
+      {
+        "hour": 9,
+        "total": 363034,
+        "avg_sev": 2.226,
+        "pct": 4.7
+      },
+      {
+        "hour": 10,
+        "total": 342706,
+        "avg_sev": 2.22,
+        "pct": 4.43
+      },
+      {
+        "hour": 11,
+        "total": 355040,
+        "avg_sev": 2.214,
+        "pct": 4.59
+      },
+      {
+        "hour": 12,
+        "total": 355001,
+        "avg_sev": 2.216,
+        "pct": 4.59
+      },
+      {
+        "hour": 13,
+        "total": 396445,
+        "avg_sev": 2.207,
+        "pct": 5.13
+      },
+      {
+        "hour": 14,
+        "total": 448846,
+        "avg_sev": 2.2,
+        "pct": 5.81
+      },
+      {
+        "hour": 15,
+        "total": 525855,
+        "avg_sev": 2.201,
+        "pct": 6.8
+      },
+      {
+        "hour": 16,
+        "total": 581969,
+        "avg_sev": 2.205,
+        "pct": 7.53
+      },
+      {
+        "hour": 17,
+        "total": 576015,
+        "avg_sev": 2.21,
+        "pct": 7.45
+      },
+      {
+        "hour": 18,
+        "total": 432042,
+        "avg_sev": 2.228,
+        "pct": 5.59
+      },
+      {
+        "hour": 19,
+        "total": 295121,
+        "avg_sev": 2.237,
+        "pct": 3.82
+      },
+      {
+        "hour": 20,
+        "total": 225226,
+        "avg_sev": 2.247,
+        "pct": 2.91
+      },
+      {
+        "hour": 21,
+        "total": 191452,
+        "avg_sev": 2.242,
+        "pct": 2.48
+      },
+      {
+        "hour": 22,
+        "total": 167645,
+        "avg_sev": 2.241,
+        "pct": 2.17
+      },
+      {
+        "hour": 23,
+        "total": 126539,
+        "avg_sev": 2.204,
+        "pct": 1.64
+      }
+    ],
+    "by_slot": [
+      {
+        "time_slot": "1. Madrugada (00-05h)",
+        "total": 774573,
+        "avg_sev": 2.218,
+        "pct": 10.02
+      },
+      {
+        "time_slot": "2. Pico Mañana (06-09h)",
+        "total": 1933919,
+        "avg_sev": 2.201,
+        "pct": 25.02
+      },
+      {
+        "time_slot": "3. Mediodía (10-14h)",
+        "total": 1898038,
+        "avg_sev": 2.211,
+        "pct": 24.56
+      },
+      {
+        "time_slot": "4. Pico Tarde (15-19h)",
+        "total": 2411002,
+        "avg_sev": 2.214,
+        "pct": 31.2
+      },
+      {
+        "time_slot": "5. Noche (20-23h)",
+        "total": 710862,
+        "avg_sev": 2.237,
+        "pct": 9.2
+      }
+    ]
+  },
+  "q3": [
+    {
+      "severity": 1,
+      "total": 67366,
+      "avg_duration": 45.72999954223633,
+      "avg_distance": 0.11500000208616257,
+      "avg_visibility": 9.479999542236328,
+      "pct": 0.87
+    },
+    {
+      "severity": 2,
+      "total": 6156981,
+      "avg_duration": 114.69000244140625,
+      "avg_distance": 0.5649999976158142,
+      "avg_visibility": 9.09000015258789,
+      "pct": 79.67
+    },
+    {
+      "severity": 3,
+      "total": 1299337,
+      "avg_duration": 67.77999877929688,
+      "avg_distance": 0.42399999499320984,
+      "avg_visibility": 9.09000015258789,
+      "pct": 16.81
+    },
+    {
+      "severity": 4,
+      "total": 204710,
+      "avg_duration": 185.89999389648438,
+      "avg_distance": 1.496000051498413,
+      "avg_visibility": 9.0600004196167,
+      "pct": 2.65
+    }
+  ],
+  "q4": [
+    {
+      "weather_group": "Despejado",
+      "total": 3405216,
+      "avg_sev": 2.184,
+      "graves": 575770,
+      "avg_temp": 63.5,
+      "avg_vis": 9.850000381469727,
+      "pct": 44.06,
+      "pct_graves": 16.91
+    },
+    {
+      "weather_group": "Nublado",
+      "total": 3163750,
+      "avg_sev": 2.235,
+      "graves": 685039,
+      "avg_temp": 62.5,
+      "avg_vis": 9.569999694824219,
+      "pct": 40.94,
+      "pct_graves": 21.65
+    },
+    {
+      "weather_group": "Lluvia",
+      "total": 600536,
+      "avg_sev": 2.246,
+      "graves": 136704,
+      "avg_temp": 59.900001525878906,
+      "avg_vis": 6.150000095367432,
+      "pct": 7.77,
+      "pct_graves": 22.76
+    },
+    {
+      "weather_group": "Niebla",
+      "total": 202142,
+      "avg_sev": 2.179,
+      "graves": 32575,
+      "avg_temp": 56.099998474121094,
+      "avg_vis": 3.0799999237060547,
+      "pct": 2.62,
+      "pct_graves": 16.11
+    },
+    {
+      "weather_group": "Nieve/Hielo",
+      "total": 179916,
+      "avg_sev": 2.237,
+      "graves": 35886,
+      "avg_temp": 25.100000381469727,
+      "avg_vis": 2.8499999046325684,
+      "pct": 2.33,
+      "pct_graves": 19.95
+    },
+    {
+      "weather_group": "Otro",
+      "total": 176834,
+      "avg_sev": 2.253,
+      "graves": 38073,
+      "avg_temp": 56.29999923706055,
+      "avg_vis": 8.720000267028809,
+      "pct": 2.29,
+      "pct_graves": 21.53
+    }
+  ],
+  "q5": {
+    "by_road": [
+      {
+        "road_type": "Autopista / Interstate",
+        "total": 2649733,
+        "avg_sev": 2.344,
+        "graves": 859526,
+        "avg_duration": 116.58000183105469,
+        "pct": 34.29,
+        "pct_graves": 32.44
+      },
+      {
+        "road_type": "Calle / Vía Urbana",
+        "total": 2401533,
+        "avg_sev": 2.113,
+        "graves": 244325,
+        "avg_duration": 96.83000183105469,
+        "pct": 31.07,
+        "pct_graves": 10.17
+      },
+      {
+        "road_type": "Avenida / Boulevard",
+        "total": 994796,
+        "avg_sev": 2.118,
+        "graves": 114946,
+        "avg_duration": 101.5999984741211,
+        "pct": 12.87,
+        "pct_graves": 11.55
+      },
+      {
+        "road_type": "Otra Vía",
+        "total": 855568,
+        "avg_sev": 2.206,
+        "graves": 158049,
+        "avg_duration": 107.1500015258789,
+        "pct": 11.07,
+        "pct_graves": 18.47
+      },
+      {
+        "road_type": "Carretera / Highway",
+        "total": 815895,
+        "avg_sev": 2.2,
+        "graves": 125864,
+        "avg_duration": 122.0,
+        "pct": 10.56,
+        "pct_graves": 15.43
+      },
+      {
+        "road_type": "Sin dato",
+        "total": 10869,
+        "avg_sev": 2.157,
+        "graves": 1337,
+        "avg_duration": 105.62999725341797,
+        "pct": 0.14,
+        "pct_graves": 12.3
+      }
+    ],
+    "top_streets": [
+      {
+        "street": "I-95 N",
+        "total": 78430,
+        "avg_sev": 2.418
+      },
+      {
+        "street": "I-95 S",
+        "total": 74528,
+        "avg_sev": 2.413
+      },
+      {
+        "street": "I-5 N",
+        "total": 71968,
+        "avg_sev": 2.341
+      },
+      {
+        "street": "I-10 E",
+        "total": 55573,
+        "avg_sev": 2.394
+      },
+      {
+        "street": "I-10 W",
+        "total": 53725,
+        "avg_sev": 2.405
+      }
+    ]
+  },
+  "q6": [
+    {
+      "day_of_week_num": 1,
+      "day_name": "Domingo",
+      "is_weekend": 1,
+      "total": 562744,
+      "avg_sev": 2.259,
+      "avg_duration": 112.56999969482422,
+      "pct": 7.28
+    },
+    {
+      "day_of_week_num": 2,
+      "day_name": "Lunes",
+      "is_weekend": 0,
+      "total": 1210921,
+      "avg_sev": 2.209,
+      "avg_duration": 104.80000305175781,
+      "pct": 15.67
+    },
+    {
+      "day_of_week_num": 3,
+      "day_name": "Martes",
+      "is_weekend": 0,
+      "total": 1290929,
+      "avg_sev": 2.205,
+      "avg_duration": 105.79000091552734,
+      "pct": 16.7
+    },
+    {
+      "day_of_week_num": 4,
+      "day_name": "Miércoles",
+      "is_weekend": 0,
+      "total": 1312389,
+      "avg_sev": 2.203,
+      "avg_duration": 106.11000061035156,
+      "pct": 16.98
+    },
+    {
+      "day_of_week_num": 5,
+      "day_name": "Jueves",
+      "is_weekend": 0,
+      "total": 1316229,
+      "avg_sev": 2.204,
+      "avg_duration": 106.83000183105469,
+      "pct": 17.03
+    },
+    {
+      "day_of_week_num": 6,
+      "day_name": "Viernes",
+      "is_weekend": 0,
+      "total": 1366499,
+      "avg_sev": 2.207,
+      "avg_duration": 110.22000122070312,
+      "pct": 17.68
+    },
+    {
+      "day_of_week_num": 7,
+      "day_name": "Sábado",
+      "is_weekend": 1,
+      "total": 668683,
+      "avg_sev": 2.241,
+      "avg_duration": 116.0,
+      "pct": 8.65
+    }
+  ],
+  "q7": [
+    {
+      "severity": 1,
+      "total": 67366,
+      "raw_avg": 53.779998779296875,
+      "clean_avg": 45.72999954223633,
+      "outliers": 10,
+      "pct_outliers": 0.01
+    },
+    {
+      "severity": 2,
+      "total": 6156981,
+      "raw_avg": 485.44000244140625,
+      "clean_avg": 114.69000244140625,
+      "outliers": 30652,
+      "pct_outliers": 0.5
+    },
+    {
+      "severity": 3,
+      "total": 1299337,
+      "raw_avg": 74.80999755859375,
+      "clean_avg": 67.77999877929688,
+      "outliers": 348,
+      "pct_outliers": 0.03
+    },
+    {
+      "severity": 4,
+      "total": 204710,
+      "raw_avg": 1685.3499755859375,
+      "clean_avg": 185.89999389648438,
+      "outliers": 3971,
+      "pct_outliers": 1.94
+    }
+  ],
+  "q8": {
+    "by_year": [
+      {
+        "year": 2016,
+        "total": 410821,
+        "avg_sev": 2.377,
+        "pct": 5.32
+      },
+      {
+        "year": 2017,
+        "total": 718093,
+        "avg_sev": 2.389,
+        "pct": 9.29
+      },
+      {
+        "year": 2018,
+        "total": 893426,
+        "avg_sev": 2.385,
+        "pct": 11.56
+      },
+      {
+        "year": 2019,
+        "total": 954303,
+        "avg_sev": 2.308,
+        "pct": 12.35
+      },
+      {
+        "year": 2020,
+        "total": 1178913,
+        "avg_sev": 2.186,
+        "pct": 15.25
+      },
+      {
+        "year": 2021,
+        "total": 1563753,
+        "avg_sev": 2.134,
+        "pct": 20.23
+      },
+      {
+        "year": 2022,
+        "total": 1762452,
+        "avg_sev": 2.072,
+        "pct": 22.8
+      },
+      {
+        "year": 2023,
+        "total": 246633,
+        "avg_sev": 2.057,
+        "pct": 3.19
+      }
+    ],
+    "by_month": [
+      {
+        "month": 1,
+        "month_name": "Enero",
+        "total": 751946,
+        "avg_sev": 2.191,
+        "pct": 9.73
+      },
+      {
+        "month": 2,
+        "month_name": "Febrero",
+        "total": 658984,
+        "avg_sev": 2.204,
+        "pct": 8.53
+      },
+      {
+        "month": 3,
+        "month_name": "Marzo",
+        "total": 554595,
+        "avg_sev": 2.233,
+        "pct": 7.18
+      },
+      {
+        "month": 4,
+        "month_name": "Abril",
+        "total": 587300,
+        "avg_sev": 2.216,
+        "pct": 7.6
+      },
+      {
+        "month": 5,
+        "month_name": "Mayo",
+        "total": 558176,
+        "avg_sev": 2.221,
+        "pct": 7.22
+      },
+      {
+        "month": 6,
+        "month_name": "Junio",
+        "total": 571373,
+        "avg_sev": 2.24,
+        "pct": 7.39
+      },
+      {
+        "month": 7,
+        "month_name": "Julio",
+        "total": 512335,
+        "avg_sev": 2.243,
+        "pct": 6.63
+      },
+      {
+        "month": 8,
+        "month_name": "Agosto",
+        "total": 599666,
+        "avg_sev": 2.237,
+        "pct": 7.76
+      },
+      {
+        "month": 9,
+        "month_name": "Septiembre",
+        "total": 651381,
+        "avg_sev": 2.215,
+        "pct": 8.43
+      },
+      {
+        "month": 10,
+        "month_name": "Octubre",
+        "total": 675130,
+        "avg_sev": 2.214,
+        "pct": 8.74
+      },
+      {
+        "month": 11,
+        "month_name": "Noviembre",
+        "total": 760165,
+        "avg_sev": 2.193,
+        "pct": 9.84
+      },
+      {
+        "month": 12,
+        "month_name": "Diciembre",
+        "total": 847343,
+        "avg_sev": 2.176,
+        "pct": 10.96
+      }
+    ]
+  },
+  "q9": [
+    {
+      "vehicle_type": "No especificado",
+      "total": 7660142,
+      "avg_sev": 2.21,
+      "graves": 1477705,
+      "avg_duration": 108.12000274658203,
+      "pct": 99.12,
+      "pct_graves": 19.29
+    },
+    {
+      "vehicle_type": "Automóvil / Multivehículo",
+      "total": 45195,
+      "avg_sev": 2.474,
+      "graves": 19444,
+      "avg_duration": 88.80999755859375,
+      "pct": 0.58,
+      "pct_graves": 43.02
+    },
+    {
+      "vehicle_type": "Camión / Tráiler",
+      "total": 16389,
+      "avg_sev": 2.521,
+      "graves": 6502,
+      "avg_duration": 124.94999694824219,
+      "pct": 0.21,
+      "pct_graves": 39.67
+    },
+    {
+      "vehicle_type": "Peatón involucrado",
+      "total": 2559,
+      "avg_sev": 2.066,
+      "graves": 133,
+      "avg_duration": 63.040000915527344,
+      "pct": 0.03,
+      "pct_graves": 5.2
+    },
+    {
+      "vehicle_type": "Autobús",
+      "total": 1502,
+      "avg_sev": 2.041,
+      "graves": 76,
+      "avg_duration": 94.02999877929688,
+      "pct": 0.02,
+      "pct_graves": 5.06
+    },
+    {
+      "vehicle_type": "Motocicleta",
+      "total": 1136,
+      "avg_sev": 2.178,
+      "graves": 169,
+      "avg_duration": 87.41000366210938,
+      "pct": 0.01,
+      "pct_graves": 14.88
+    },
+    {
+      "vehicle_type": "SUV / Van / Pickup",
+      "total": 1008,
+      "avg_sev": 2.012,
+      "graves": 11,
+      "avg_duration": 158.1999969482422,
+      "pct": 0.01,
+      "pct_graves": 1.09
+    },
+    {
+      "vehicle_type": "Bicicleta",
+      "total": 463,
+      "avg_sev": 2.0,
+      "graves": 7,
+      "avg_duration": 74.36000061035156,
+      "pct": 0.01,
+      "pct_graves": 1.51
+    }
+  ],
+  "q10": {
+    "hotspots": [
+      {
+        "lat_grid": 25.899999618530273,
+        "lng_grid": -80.19999694824219,
+        "state": "FL",
+        "city": "Miami",
+        "total": 37642,
+        "avg_sev": 2.216
+      },
+      {
+        "lat_grid": 25.700000762939453,
+        "lng_grid": -80.4000015258789,
+        "state": "FL",
+        "city": "Miami",
+        "total": 33739,
+        "avg_sev": 2.009
+      },
+      {
+        "lat_grid": 35.20000076293945,
+        "lng_grid": -80.80000305175781,
+        "state": "NC",
+        "city": "Charlotte",
+        "total": 33301,
+        "avg_sev": 2.014
+      },
+      {
+        "lat_grid": 35.79999923706055,
+        "lng_grid": -78.5999984741211,
+        "state": "NC",
+        "city": "Raleigh",
+        "total": 33281,
+        "avg_sev": 2.099
+      },
+      {
+        "lat_grid": 34.0,
+        "lng_grid": -118.19999694824219,
+        "state": "CA",
+        "city": "Los Angeles",
+        "total": 32937,
+        "avg_sev": 2.198
+      },
+      {
+        "lat_grid": 32.79999923706055,
+        "lng_grid": -96.80000305175781,
+        "state": "TX",
+        "city": "Dallas",
+        "total": 32666,
+        "avg_sev": 2.256
+      },
+      {
+        "lat_grid": 34.0,
+        "lng_grid": -118.30000305175781,
+        "state": "CA",
+        "city": "Los Angeles",
+        "total": 31142,
+        "avg_sev": 2.279
+      },
+      {
+        "lat_grid": 30.399999618530273,
+        "lng_grid": -91.0999984741211,
+        "state": "LA",
+        "city": "Baton Rouge",
+        "total": 27183,
+        "avg_sev": 2.077
+      },
+      {
+        "lat_grid": 36.20000076293945,
+        "lng_grid": -86.80000305175781,
+        "state": "TN",
+        "city": "Nashville",
+        "total": 26485,
+        "avg_sev": 2.161
+      },
+      {
+        "lat_grid": 25.799999237060547,
+        "lng_grid": -80.19999694824219,
+        "state": "FL",
+        "city": "Miami",
+        "total": 26069,
+        "avg_sev": 2.253
+      }
+    ],
+    "infra": {
+      "Semaforos": 1143772,
+      "Cruces_Peatonales": 873763,
+      "Enlaces_Autopista": 571342,
+      "Senales_Pare": 214371,
+      "Estaciones_Transporte": 201901,
+      "Pasos_Nivel_Tren": 66979
+    }
+  }
+}

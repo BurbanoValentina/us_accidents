@@ -1,0 +1,1510 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TrafficPulse AI | Centro Ejecutivo de Analítica Vial & Arquitectura ETL</title>
+  <!-- Google Fonts & Tailwind CDN -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            brand: {
+              50: '#F0F7FF',
+              100: '#E0EFFF',
+              500: '#0284C7',
+              600: '#0369A1',
+              800: '#075985',
+              900: '#0C4A6E',
+              navy: '#0B192C',
+              dark: '#030712'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Custom scrollbar and glassmorphism styling */
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: #0F172A; }
+    ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+    ::-webkit-scrollbar-thumb:hover { background: #475569; }
+    
+    .glass-card {
+      background: rgba(15, 23, 42, 0.75);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    
+    .glass-panel {
+      background: rgba(30, 41, 59, 0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, #0284C7 0%, #0369A1 100%);
+      color: #FFFFFF;
+      box-shadow: 0 4px 14px 0 rgba(2, 132, 199, 0.39);
+    }
+
+    @media print {
+      body { background: white !important; color: black !important; }
+      nav, header, .no-print { display: none !important; }
+      .glass-card, .glass-panel { background: white !important; border: 1px solid #E2E8F0 !important; color: black !important; box-shadow: none !important; }
+      .tab-content { display: block !important; }
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 font-sans min-h-screen selection:bg-sky-500 selection:text-white">
+
+  <!-- ========================================================================= -->
+  <!-- TOP NAVIGATION BAR -->
+  <!-- ========================================================================= -->
+  <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 shadow-xl">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="flex items-center justify-between h-20">
+        
+        <!-- Logo & Title -->
+        <div class="flex items-center space-x-4">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-tr from-sky-500 via-indigo-500 to-teal-400 flex items-center justify-center shadow-lg shadow-sky-500/20">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+            </svg>
+          </div>
+          <div>
+            <div class="flex items-center space-x-2">
+              <span class="text-xl font-bold tracking-tight text-white">TrafficPulse <span class="text-sky-400">Analytics</span></span>
+              <span class="text-xs bg-sky-950 text-sky-400 px-2 py-0.5 rounded-full border border-sky-800 font-medium">Enterprise v3.0</span>
+            </div>
+            <p class="text-xs text-slate-400 font-medium">Proyecto 3: Análisis de Accidentes de Tránsito en Zonas Urbanas de EE.UU.</p>
+          </div>
+        </div>
+
+        <!-- KPI Quick Bar -->
+        <div class="hidden lg:flex items-center space-x-6 text-xs">
+          <div class="flex items-center space-x-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700/60">
+            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+            <span class="text-slate-400">Total Dataset:</span>
+            <span class="font-bold text-white font-mono">7,728,394</span>
+          </div>
+          <div class="flex items-center space-x-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700/60">
+            <span class="text-slate-400">Compresión Parquet:</span>
+            <span class="font-bold text-sky-400 font-mono">374 MB (Snappy)</span>
+          </div>
+          <div class="flex items-center space-x-2 bg-slate-800/60 px-3 py-1.5 rounded-lg border border-slate-700/60">
+            <span class="text-slate-400">SQLite Base:</span>
+            <span class="font-bold text-emerald-400 font-mono">8 Índices B-Tree</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center space-x-3">
+          <button onclick="window.print()" class="no-print hidden sm:inline-flex items-center space-x-2 px-3 py-2 text-xs font-semibold text-slate-300 bg-slate-800 hover:bg-slate-700 hover:text-white rounded-lg border border-slate-700 transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+            </svg>
+            <span>Imprimir / PDF</span>
+          </button>
+        </div>
+
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="flex space-x-2 pb-3 overflow-x-auto no-print">
+        <button onclick="switchTab('seccion-preguntas')" id="tab-seccion-preguntas" class="tab-btn active px-4 py-2 text-sm font-semibold rounded-lg text-slate-300 hover:text-white transition flex items-center space-x-2 whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>
+          <span>1. Preguntas y Respuestas (10 Gráficas SQL)</span>
+        </button>
+
+        <button onclick="switchTab('seccion-anova')" id="tab-seccion-anova" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center space-x-2 whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+          <span>2. Análisis Inferencial ANOVA</span>
+        </button>
+
+        <button onclick="switchTab('seccion-infografia')" id="tab-seccion-infografia" class="tab-btn px-4 py-2 text-sm font-semibold rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition flex items-center space-x-2 whitespace-nowrap">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"/></svg>
+          <span>3. Infografía del Proyecto & Guía de Comandos</span>
+        </button>
+      </nav>
+
+    </div>
+  </header>
+
+  <!-- ========================================================================= -->
+  <!-- MAIN CONTAINER -->
+  <!-- ========================================================================= -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+    <!-- ======================================================================= -->
+    <!-- SECCIÓN 1: PREGUNTAS Y RESPUESTAS (10 REQUERIMIENTOS Y GRÁFICAS) -->
+    <!-- ======================================================================= -->
+    <section id="seccion-preguntas" class="tab-content space-y-10">
+
+      <!-- Executive Overview Banner -->
+      <div class="glass-card rounded-2xl p-6 sm:p-8 border border-sky-900/40 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-64 h-64 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+          <div class="space-y-2">
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-950 text-sky-400 border border-sky-800">
+              Módulo Analítico Principal
+            </span>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+              10 Requerimientos Analíticos & Consultas SQL
+            </h1>
+            <p class="text-slate-300 text-sm max-w-3xl leading-relaxed">
+              Exploración multidimensional de 7,728,394 accidentes registrados en Estados Unidos entre 2016 y 2023. Cada requerimiento incluye su formulación de negocio, métricas agregadas, consulta SQL optimizada con índices y su gráfica analítica correspondiente.
+            </p>
+          </div>
+
+          <!-- Quick Jump Dropdown / Index -->
+          <div class="w-full md:w-auto bg-slate-900/80 p-3 rounded-xl border border-slate-800">
+            <label class="text-xs text-slate-400 block mb-1 font-medium">Saltar a requerimiento:</label>
+            <select onchange="scrollToQuestion(this.value)" class="bg-slate-950 text-slate-200 text-xs rounded-lg px-3 py-2 border border-slate-700 w-full focus:outline-none focus:border-sky-500">
+              <option value="q1">1. Frecuencia por Estado y Ciudad</option>
+              <option value="q2">2. Hora del Día y Patrón Horario</option>
+              <option value="q3">3. Severidad e Impacto Vial</option>
+              <option value="q4">4. Condiciones Climáticas</option>
+              <option value="q5">5. Tipos de Vía Más Peligrosos</option>
+              <option value="q6">6. Días de la Semana</option>
+              <option value="q7">7. Duración Bruta vs Depurada</option>
+              <option value="q8">8. Tendencias Mensuales y Anuales</option>
+              <option value="q9">9. Vehículos Involucrados (NLP)</option>
+              <option value="q10">10. Puntos Críticos y Semáforos</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid of 10 Questions -->
+      <div class="space-y-12">
+
+        <!-- PREGUNTA 1 -->
+        <article id="q1" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">01</span>
+              <h2 class="text-xl font-bold text-white">Frecuencia de Accidentes por Estado y Ciudad</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">state, city, severity</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Cuáles son las entidades geográficas y áreas metropolitanas con mayor siniestralidad absoluta y qué severidad promedio experimentan?
+          </p>
+
+          <!-- KPI Mini Cards -->
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Top 1 Estado</span>
+              <span class="text-lg font-bold text-white">California (CA)</span>
+              <span class="text-xs text-sky-400 block font-mono">1.74M (22.53%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Top 2 Estado</span>
+              <span class="text-lg font-bold text-white">Florida (FL)</span>
+              <span class="text-xs text-sky-400 block font-mono">880K (11.39%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Top Ciudad Urbana</span>
+              <span class="text-lg font-bold text-white">Miami, FL</span>
+              <span class="text-xs text-emerald-400 block font-mono">186,768 (2.42%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Top 2 Ciudad</span>
+              <span class="text-lg font-bold text-white">Houston, TX</span>
+              <span class="text-xs text-emerald-400 block font-mono">169,428 (2.19%)</span>
+            </div>
+          </div>
+
+          <!-- Answer & Insights -->
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              California y Florida concentran más de un tercio (<strong>33.92%</strong>) de la siniestralidad total nacional debido a su alta densidad demográfica y extensa red vial interestatal. En el ámbito urbano, Miami (FL), Houston (TX), Los Ángeles (CA), Charlotte (NC) y Dallas (TX) lideran el ranking de concentración de accidentes. La severidad promedio en Virginia (2.28) y Texas (2.22) supera al promedio nacional.
+            </p>
+          </div>
+
+          <!-- Chart & SQL Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <!-- Image with Lightbox Trigger -->
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_01_accidentes_estado_ciudad.png', 'Gráfica 1: Frecuencia de Accidentes por Estado y Ciudad')">
+              <img src="assets/images/grafica_01_accidentes_estado_ciudad.png" alt="Gráfica 1: Frecuencia de Accidentes por Estado y Ciudad" class="w-full h-auto rounded-lg object-cover group-hover:opacity-95 transition">
+              <div class="absolute inset-0 bg-sky-950/20 opacity-0 group-hover:opacity-100 transition rounded-xl flex items-center justify-center">
+                <span class="bg-slate-900/90 text-white text-xs px-3 py-1.5 rounded-lg border border-slate-700 shadow-lg flex items-center space-x-1">
+                  <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"/></svg>
+                  <span>Click para ampliar</span>
+                </span>
+              </div>
+            </div>
+
+            <!-- SQL Query Display -->
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (state)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    state AS Estado,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Nacional,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio
+FROM accidents
+GROUP BY state
+ORDER BY Total_Accidentes DESC
+LIMIT 10;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 2 -->
+        <article id="q2" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">02</span>
+              <h2 class="text-xl font-bold text-white">Hora del Día con Mayor Accidentalidad (Patrón Horario)</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">hour, time_slot, severity</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿En qué horas del día ocurren más accidentes viales y cómo se correlaciona la franja horaria con la gravedad del incidente?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Pico Matutino</span>
+              <span class="text-lg font-bold text-white">07:00h - 08:00h</span>
+              <span class="text-xs text-sky-400 block font-mono">587,472 (7.6%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Pico Vespertino</span>
+              <span class="text-lg font-bold text-white">16:00h - 17:00h</span>
+              <span class="text-xs text-sky-400 block font-mono">1,152,000 (~15%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Mayor Severidad</span>
+              <span class="text-lg font-bold text-red-400">01:00h - 04:00h</span>
+              <span class="text-xs text-red-400 block font-mono">Severidad: 2.30+</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Distribución</span>
+              <span class="text-lg font-bold text-emerald-400">Curva Bimodal</span>
+              <span class="text-xs text-slate-400 block">Commuter Peaks</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Existe un marcado <strong>patrón bimodal de transporte</strong>: el primer pico se registra a las 07:00-08:00 (entrada laboral) y el segundo, de mayor magnitud, a las 16:00-17:00 (retorno a casa). En contraste, la madrugada (00:00 a 04:00) registra el menor volumen pero la <strong>máxima severidad relativa (2.31 a 2.38)</strong> atribuible a mayor velocidad libre de vías, fatiga y consumo de alcohol.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_02_hora_del_dia_accidentalidad.png', 'Gráfica 2: Patrón Horario y Severidad')">
+              <img src="assets/images/grafica_02_hora_del_dia_accidentalidad.png" alt="Gráfica 2: Hora del día" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (hour)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    hour AS Hora_24h,
+    time_slot AS Franja_Horaria,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Nacional,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio
+FROM accidents
+WHERE hour IS NOT NULL AND hour >= 0
+GROUP BY hour, time_slot
+ORDER BY Total_Accidentes DESC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 3 -->
+        <article id="q3" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">03</span>
+              <h2 class="text-xl font-bold text-white">Análisis por Severidad del Accidente (Distribución y Duración)</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">severity, duration_clean_min, distance_mi</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Cómo se distribuyen los 4 niveles de gravedad de accidentes y qué impacto generan en la duración del cierre y distancia de calzada afectada?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Severidad 2 (Dominante)</span>
+              <span class="text-lg font-bold text-sky-400">6,157,605</span>
+              <span class="text-xs text-slate-400 font-mono">79.67% del total</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Severidad 3 (Grave)</span>
+              <span class="text-lg font-bold text-amber-400">1,299,076</span>
+              <span class="text-xs text-slate-400 font-mono">16.81% del total</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Severidad 4 (Crítica)</span>
+              <span class="text-lg font-bold text-red-400">204,360</span>
+              <span class="text-xs text-slate-400 font-mono">2.65% del total</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Duración Media S4</span>
+              <span class="text-lg font-bold text-white">185.9 min</span>
+              <span class="text-xs text-red-400 font-mono">~3.1 horas de cierre</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Cerca del <strong>80% de los accidentes</strong> son clasificados en Severidad 2 (impacto moderado en la vía con 104 min de duración). Sin embargo, los siniestros de <strong>Severidad 4</strong> demandan un promedio de <strong>185.9 minutos (~3.1 horas)</strong> para despeje y afectan 1.5 millas de calzada, provocando pérdidas masivas por congestión.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_03_analisis_por_severidad.png', 'Gráfica 3: Análisis por Severidad')">
+              <img src="assets/images/grafica_03_analisis_por_severidad.png" alt="Gráfica 3: Severidad" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (severity)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    severity AS Nivel_Severidad,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Total,
+    ROUND(AVG(duration_clean_min), 2) AS Duracion_Media_Min,
+    ROUND(AVG(distance_mi), 3) AS Distancia_Media_Mi,
+    ROUND(AVG(visibility_mi), 2) AS Visibilidad_Media_Mi
+FROM accidents
+WHERE severity IS NOT NULL
+GROUP BY severity
+ORDER BY severity ASC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 4 -->
+        <article id="q4" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">04</span>
+              <h2 class="text-xl font-bold text-white">Relación con Condiciones Climáticas</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">weather_group, temperature_f, visibility_mi</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Cómo influyen las categorías meteorológicas en el volumen y la gravedad de los accidentes?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Despejado</span>
+              <span class="text-lg font-bold text-white">3,408,000</span>
+              <span class="text-xs text-sky-400 font-mono">44.1% del total</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Nublado</span>
+              <span class="text-lg font-bold text-white">3,161,000</span>
+              <span class="text-xs text-sky-400 font-mono">40.9% del total</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Lluvia / Precipitación</span>
+              <span class="text-lg font-bold text-red-400">22.76% Graves</span>
+              <span class="text-xs text-slate-400 font-mono">Severidad: 2.25</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Nieve / Hielo</span>
+              <span class="text-lg font-bold text-amber-400">Visib: 2.8 mi</span>
+              <span class="text-xs text-slate-400 font-mono">Peligro adherencia</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              El <strong>85% de los accidentes ocurren en clima Despejado o Nublado</strong>, dado que representan la condición habitual de exposición al tráfico. Sin embargo, cuando se presentan condiciones de <strong>Lluvia o Tormenta</strong>, la tasa de siniestros graves se incrementa al <strong>22.76%</strong> (severidad media 2.25). La Nieve/Hielo reduce drásticamente la visibilidad a 2.8 millas y dispara los tiempos de reacción vehicular.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_04_relacion_condiciones_climaticas.png', 'Gráfica 4: Condiciones Climáticas')">
+              <img src="assets/images/grafica_04_relacion_condiciones_climaticas.png" alt="Gráfica 4: Clima" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (weather_group)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    weather_group AS Categoria_Clima,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Total,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio,
+    SUM(CASE WHEN severity >= 3 THEN 1 ELSE 0 END) AS Siniestros_Graves,
+    ROUND(SUM(CASE WHEN severity >= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS Pct_Graves,
+    ROUND(AVG(temperature_f), 1) AS Temp_Prom_F,
+    ROUND(AVG(visibility_mi), 2) AS Visibilidad_Prom_Mi
+FROM accidents
+GROUP BY weather_group
+ORDER BY Total_Accidentes DESC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 5 -->
+        <article id="q5" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">05</span>
+              <h2 class="text-xl font-bold text-white">Tipos de Vía Más Peligrosos (Jerarquía Vial y Vías Críticas)</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">road_type, street, severity</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Qué tipo de infraestructura vial (autopistas, carreteras estatales, calles locales) presenta la mayor gravedad y cuáles vías específicas son más críticas?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Vía Más Peligrosa</span>
+              <span class="text-lg font-bold text-red-400">Autopista / Interstate</span>
+              <span class="text-xs text-slate-400 font-mono">34.3% del total</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Severidad Autopista</span>
+              <span class="text-lg font-bold text-white">2.34 (Promedio)</span>
+              <span class="text-xs text-red-400 font-mono">32.44% Graves</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Top Vía Nacional</span>
+              <span class="text-lg font-bold text-white">I-95 N (Costa Este)</span>
+              <span class="text-xs text-sky-400 font-mono">78,430 accidentes</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Top 2 Vía</span>
+              <span class="text-lg font-bold text-white">I-95 S</span>
+              <span class="text-xs text-sky-400 font-mono">74,528 accidentes</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Las <strong>Autopistas e Interestatales (Interstate Highways)</strong> son la infraestructura con mayor peligrosidad: concentran el 34.3% del volumen nacional y el <strong>32.44% de todos los incidentes graves (S3 y S4)</strong> con severidad media de 2.34. La <strong>corredor I-95</strong> (sentidos Norte y Sur) es la arteria más siniestrada de EE.UU., sumando más de 152,000 incidentes.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_05_tipos_de_via_mas_peligrosos.png', 'Gráfica 5: Tipos de Vía Más Peligrosos')">
+              <img src="assets/images/grafica_05_tipos_de_via_mas_peligrosos.png" alt="Gráfica 5: Tipos de vía" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (road_type)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    road_type AS Tipo_Via,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Total,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio,
+    SUM(CASE WHEN severity >= 3 THEN 1 ELSE 0 END) AS Incidentes_Graves,
+    ROUND(SUM(CASE WHEN severity >= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS Pct_Graves,
+    ROUND(AVG(duration_clean_min), 2) AS Duracion_Promedio_Min
+FROM accidents
+GROUP BY road_type
+ORDER BY Total_Accidentes DESC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 6 -->
+        <article id="q6" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">06</span>
+              <h2 class="text-xl font-bold text-white">Días de la Semana con Más Incidentes</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">day_name, is_weekend, severity</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Qué días de la semana registran mayor concentración de siniestros y cómo cambia la gravedad entre días laborales y fin de semana?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Día con Más Accidentes</span>
+              <span class="text-lg font-bold text-white">Viernes (Friday)</span>
+              <span class="text-xs text-sky-400 font-mono">1,366,000 (17.68%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Laborales (Lun-Vie)</span>
+              <span class="text-lg font-bold text-emerald-400">81.7% Volumen</span>
+              <span class="text-xs text-slate-400 font-mono">Alta densidad tráfico</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Fin de Semana</span>
+              <span class="text-lg font-bold text-amber-400">18.3% Volumen</span>
+              <span class="text-xs text-slate-400 font-mono">Menor flujo vehicular</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Mayor Severidad</span>
+              <span class="text-lg font-bold text-red-400">Domingo (2.26)</span>
+              <span class="text-xs text-red-400 font-mono">Sábado: 116.2 min</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              El <strong>Viernes</strong> lidera la accidentalidad semanal con 1.37 millones de casos (17.68%), impulsado por la confluencia de traslados laborales y salidas recreativas. Los fines de semana registran casi la mitad de los incidentes que un día laboral, pero la <strong>severidad promedio aumenta a 2.26 el domingo</strong> y la duración media de despeje a 116.2 minutos el sábado, evidenciando choques a mayor velocidad.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_06_dias_semana_mas_incidentes.png', 'Gráfica 6: Días de la Semana')">
+              <img src="assets/images/grafica_06_dias_semana_mas_incidentes.png" alt="Gráfica 6: Días de la semana" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (day_of_week_num)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    day_of_week_num AS Num_Dia,
+    day_name AS Dia_Semana,
+    CASE WHEN is_weekend = 1 THEN 'Fin de semana' ELSE 'Laboral' END AS Tipo_Dia,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Total,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio,
+    ROUND(AVG(duration_clean_min), 2) AS Duracion_Promedio_Min
+FROM accidents
+WHERE day_of_week_num IS NOT NULL
+GROUP BY day_of_week_num, day_name, is_weekend
+ORDER BY Total_Accidentes DESC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 7 -->
+        <article id="q7" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">07</span>
+              <h2 class="text-xl font-bold text-white">Promedio de Duración del Incidente (Bruta vs Depurada &lt;= 24h)</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">duration_raw_min, duration_clean_min</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Cuál es la duración promedio real de un incidente y cuál es el impacto de los valores atípicos administrativos superiores a 24 horas?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Duración Bruta</span>
+              <span class="text-lg font-bold text-slate-400">444.4 min</span>
+              <span class="text-xs text-amber-400 font-mono">~7.4h (Distorsionada)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Duración Depurada</span>
+              <span class="text-lg font-bold text-emerald-400">108.0 min</span>
+              <span class="text-xs text-emerald-400 font-mono">~1.8h (Operativa Real)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Outliers Detectados</span>
+              <span class="text-lg font-bold text-red-400">34,981 filas</span>
+              <span class="text-xs text-slate-400 font-mono">0.45% con &gt; 24h</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Reducción Sesgo</span>
+              <span class="text-lg font-bold text-sky-400">-75.7%</span>
+              <span class="text-xs text-sky-400 font-mono">Calidad de datos</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              La duración promedio bruta nacional calculada a partir de timestamps originales arroja un valor artificial de <strong>444.4 min (7.4 horas)</strong> debido a <strong>34,981 incidentes</strong> que permanecieron abiertos administrativamente durante días o semanas. Al aplicar el filtro de ingeniería de datos (duración $\le 24$ horas), la <strong>duración operacional real es de 108.0 minutos</strong> (45.7 min en Severidad 1 frente a 185.9 min en Severidad 4).
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_07_promedio_duracion_incidente.png', 'Gráfica 7: Duración Bruta vs Depurada')">
+              <img src="assets/images/grafica_07_promedio_duracion_incidente.png" alt="Gráfica 7: Duración" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Data Quality Analysis</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    severity AS Nivel_Severidad,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(AVG(duration_raw_min), 2) AS Duracion_Bruta_Prom_Min,
+    ROUND(AVG(duration_clean_min), 2) AS Duracion_Depurada_Prom_Min,
+    SUM(CASE WHEN duration_raw_min > 1440 THEN 1 ELSE 0 END) AS Outliers_gt_24h,
+    ROUND(SUM(CASE WHEN duration_raw_min > 1440 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS Pct_Outliers
+FROM accidents
+GROUP BY severity
+ORDER BY severity ASC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 8 -->
+        <article id="q8" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">08</span>
+              <h2 class="text-xl font-bold text-white">Tendencias Mensuales y Anuales (Serie Histórica y Estacionalidad)</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">year, month, month_name</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Cómo ha evolucionado la serie histórica de accidentes (2016-2023) y cuáles meses exhiben mayor riesgo estacional?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Año Pico Histórico</span>
+              <span class="text-lg font-bold text-white">Año 2022</span>
+              <span class="text-xs text-sky-400 font-mono">1.76M (22.8%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Año 2016 (Inicio)</span>
+              <span class="text-lg font-bold text-slate-300">410,652</span>
+              <span class="text-xs text-slate-400 font-mono">Expansión sensores</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Mes Pico Nacional</span>
+              <span class="text-lg font-bold text-red-400">Diciembre</span>
+              <span class="text-xs text-red-400 font-mono">847,343 (10.96%)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Mes 2 Pico</span>
+              <span class="text-lg font-bold text-amber-400">Noviembre</span>
+              <span class="text-xs text-slate-400 font-mono">760,000 (9.84%)</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              El volumen de accidentes capturados creció progresivamente entre 2016 y 2022 producto del despliegue masivo de sensores de telemetría IoT y fuentes de tráfico en tiempo real. En el plano estacional, <strong>Diciembre (847,343 casos, 10.96%)</strong> y <strong>Noviembre (9.84%)</strong> representan los meses más críticos a nivel nacional debido a las festividades de fin de año, mayor volumen de desplazamientos y condiciones climáticas invernales.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_08_tendencias_mensuales_anuales.png', 'Gráfica 8: Tendencias Mensuales y Anuales')">
+              <img src="assets/images/grafica_08_tendencias_mensuales_anuales.png" alt="Gráfica 8: Tendencias" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (year, month)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    year AS Anio,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Total,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio
+FROM accidents
+WHERE year IS NOT NULL
+GROUP BY year
+ORDER BY year ASC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 9 -->
+        <article id="q9" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">09</span>
+              <h2 class="text-xl font-bold text-white">Accidentes por Tipo de Vehículo Involucrado (Minería de Texto / NLP)</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">vehicle_type, regex RE2</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Qué tipos de vehículos participan en los accidentes y cuáles causan mayores tiempos de despeje y gravedad?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Camión / Tráiler</span>
+              <span class="text-lg font-bold text-red-400">124.95 min</span>
+              <span class="text-xs text-red-400 font-mono">Severidad: 2.52</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Automóvil / Multi</span>
+              <span class="text-lg font-bold text-amber-400">43.02% Graves</span>
+              <span class="text-xs text-slate-400 font-mono">Alta tasa S3-S4</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Motocicletas</span>
+              <span class="text-lg font-bold text-white">Sev: 2.38</span>
+              <span class="text-xs text-slate-400 font-mono">Alta letalidad</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Menciones NLP</span>
+              <span class="text-lg font-bold text-emerald-400">68,252 casos</span>
+              <span class="text-xs text-emerald-400 font-mono">Cero falsos positivos</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              Mediante expresiones regulares compiladas en C++ (PyArrow Compute RE2), se minaron los textos descriptivos descartando toponimias viales falsas. Los accidentes que involucran <strong>Camiones de Carga y Tráilers</strong> presentan la mayor severidad (<strong>2.52</strong>) y la mayor duración de despeje (<strong>124.95 minutos</strong>) debido a la complejidad logística de mover carga pesada. Los incidentes entre múltiples automóviles registran la mayor tasa de siniestros graves (43.02%).
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_09_accidentes_tipo_vehiculo.png', 'Gráfica 9: Tipo de Vehículo')">
+              <img src="assets/images/grafica_09_accidentes_tipo_vehiculo.png" alt="Gráfica 9: Vehículos" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Indexed by (vehicle_type)</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    vehicle_type AS Tipo_Vehiculo,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(COUNT(*) * 100.0 / 7728394, 2) AS Pct_Total,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio,
+    SUM(CASE WHEN severity >= 3 THEN 1 ELSE 0 END) AS Accidentes_Graves,
+    ROUND(SUM(CASE WHEN severity >= 3 THEN 1 ELSE 0 END) * 100.0 / COUNT(*), 2) AS Pct_Graves,
+    ROUND(AVG(duration_clean_min), 2) AS Duracion_Prom_Min
+FROM accidents
+GROUP BY vehicle_type
+ORDER BY Total_Accidentes DESC;</code></pre>
+            </div>
+          </div>
+        </article>
+
+        <!-- PREGUNTA 10 -->
+        <article id="q10" class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800 transition hover:border-slate-700">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div class="flex items-center space-x-3">
+              <span class="w-8 h-8 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 flex items-center justify-center font-bold text-sm">10</span>
+              <h2 class="text-xl font-bold text-white">Distribución Geoespacial de Puntos Críticos (Hotspots & Infraestructura)</h2>
+            </div>
+            <span class="text-xs px-2.5 py-1 rounded-full bg-slate-800 text-slate-300 font-mono">start_lat, start_lng, traffic_signal, crossing</span>
+          </div>
+
+          <p class="text-slate-300 text-sm mb-6">
+            <strong class="text-white">Pregunta de negocio:</strong> ¿Dónde se ubican los clústeres geográficos de mayor siniestralidad urbana y qué elementos viales físicos están presentes en el lugar?
+          </p>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Hotspot #1 Nacional</span>
+              <span class="text-lg font-bold text-red-400">Miami, FL</span>
+              <span class="text-xs text-slate-400 font-mono">53,220 acc (25.9 / -80.2)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Hotspot #2 Nacional</span>
+              <span class="text-lg font-bold text-amber-400">Los Ángeles, CA</span>
+              <span class="text-xs text-slate-400 font-mono">39,838 acc (34.0 / -118.2)</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">En Semáforos</span>
+              <span class="text-lg font-bold text-white">1,140,000</span>
+              <span class="text-xs text-sky-400 font-mono">Traffic Signals</span>
+            </div>
+            <div class="glass-panel p-3 rounded-xl">
+              <span class="text-xs text-slate-400 block">Cruces Peatonales</span>
+              <span class="text-lg font-bold text-white">873,000</span>
+              <span class="text-xs text-sky-400 font-mono">Crossings</span>
+            </div>
+          </div>
+
+          <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800/80 mb-6">
+            <h3 class="text-xs font-bold uppercase tracking-wider text-sky-400 mb-1 flex items-center space-x-1.5">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Respuesta & Hallazgo Clave</span>
+            </h3>
+            <p class="text-slate-300 text-sm leading-relaxed">
+              La cuadrícula geográfica (grid 0.1° $\approx$ 11 km) sitúa los puntos de mayor siniestralidad acumulada en las áreas metropolitanas de <strong>Miami (FL)</strong> y <strong>Los Ángeles (CA)</strong>, seguidas de Charlotte (NC) y Dallas (TX). En cuanto a infraestructura, más de <strong>1.14 millones de accidentes ocurren en intersecciones semaforizadas</strong> y 873 mil en cruces peatonales, indicando puntos de conflicto de giro y derecho de vía en el tejido urbano.
+            </p>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            <div class="lg:col-span-7 bg-slate-900 p-2 rounded-xl border border-slate-800 group relative cursor-pointer" onclick="openModal('assets/images/grafica_10_distribucion_geoespacial_criticos.png', 'Gráfica 10: Hotspots e Infraestructura')">
+              <img src="assets/images/grafica_10_distribucion_geoespacial_criticos.png" alt="Gráfica 10: Geoespacial" class="w-full h-auto rounded-lg object-cover">
+            </div>
+            <div class="lg:col-span-5 bg-slate-950 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto">
+              <div class="flex items-center justify-between pb-2 mb-2 border-b border-slate-800 text-slate-400">
+                <span>Consulta SQL Principal</span>
+                <span class="text-emerald-400 text-[10px]">Geospatial Aggregation</span>
+              </div>
+              <pre class="text-sky-300"><code>SELECT 
+    ROUND(start_lat, 1) AS Lat_Grid,
+    ROUND(start_lng, 1) AS Lng_Grid,
+    state AS Estado,
+    city AS Ciudad_Cercana,
+    COUNT(*) AS Total_Accidentes,
+    ROUND(AVG(severity), 3) AS Severidad_Promedio
+FROM accidents
+WHERE start_lat IS NOT NULL AND start_lng IS NOT NULL
+GROUP BY Lat_Grid, Lng_Grid
+ORDER BY Total_Accidentes DESC
+LIMIT 10;</code></pre>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- SECCIÓN 2: ANÁLISIS INFERENCIAL ANOVA -->
+    <!-- ======================================================================= -->
+    <section id="seccion-anova" class="tab-content hidden space-y-10">
+
+      <!-- ANOVA Header Banner -->
+      <div class="glass-card rounded-2xl p-6 sm:p-8 border border-indigo-900/40 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="space-y-3">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-indigo-950 text-indigo-300 border border-indigo-800">
+            Estadística Inferencial & Pruebas de Hipótesis
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Análisis de Varianza (ANOVA) - Factores de Severidad
+          </h1>
+          <p class="text-slate-300 text-sm max-w-4xl leading-relaxed">
+            Evaluación matemática formal para comprobar si la clasificación de severidad del accidente (niveles 1, 2, 3 y 4) introduce diferencias estadísticamente significativas en el tiempo de duración del cierre vial (<code class="text-sky-300 font-mono">duration_clean_min</code>) y en la visibilidad atmosférica (<code class="text-sky-300 font-mono">visibility_mi</code>).
+          </p>
+        </div>
+      </div>
+
+      <!-- Hypothesis & Assumptions Panel -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- Formulación de Hipótesis -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-800">
+          <h2 class="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-lg bg-sky-950 text-sky-400 border border-sky-800 flex items-center justify-center font-bold text-xs">H</span>
+            <span>1. Formulación de Hipótesis Estadísticas</span>
+          </h2>
+
+          <div class="space-y-4 text-xs">
+            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+              <h3 class="font-bold text-sky-400 text-sm mb-1">Variable 1: Duración del Accidente (duration_clean_min)</h3>
+              <p class="text-slate-300 mb-2 font-mono">H0: μ1 = μ2 = μ3 = μ4</p>
+              <p class="text-slate-400 leading-relaxed">
+                <strong class="text-slate-200">Hipótesis Nula (H0):</strong> Las duraciones medias de cierre vial son iguales entre todos los niveles de severidad.<br>
+                <strong class="text-slate-200">Hipótesis Alternativa (Ha):</strong> Al menos un nivel de severidad difiere significativamente en su duración promedio.
+              </p>
+            </div>
+
+            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+              <h3 class="font-bold text-indigo-400 text-sm mb-1">Variable 2: Visibilidad en Millas (visibility_mi)</h3>
+              <p class="text-slate-300 mb-2 font-mono">H0: μ1 = μ2 = μ3 = μ4</p>
+              <p class="text-slate-400 leading-relaxed">
+                <strong class="text-slate-200">Hipótesis Nula (H0):</strong> La visibilidad atmosférica promedio es idéntica en los cuatro niveles de severidad.<br>
+                <strong class="text-slate-200">Hipótesis Alternativa (Ha):</strong> La visibilidad media difiere de forma significativa en al menos un nivel.
+              </p>
+            </div>
+            
+            <p class="text-slate-400 italic">Criterio de decisión: Nivel de significancia preestablecido α = 0.05. Se rechaza H0 si p-valor &lt; 0.05.</p>
+          </div>
+        </div>
+
+        <!-- Validación de Supuestos -->
+        <div class="glass-card rounded-2xl p-6 border border-slate-800">
+          <h2 class="text-lg font-bold text-white mb-4 flex items-center space-x-2">
+            <span class="w-7 h-7 rounded-lg bg-indigo-950 text-indigo-400 border border-indigo-800 flex items-center justify-center font-bold text-xs">S</span>
+            <span>2. Supuestos: Normalidad y Levene</span>
+          </h2>
+
+          <div class="space-y-4 text-xs">
+            <!-- Normalidad -->
+            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-white text-sm">Supuesto de Normalidad</span>
+                <span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-400 border border-emerald-800 font-semibold text-[10px]">Asintóticamente Válido</span>
+              </div>
+              <p class="text-slate-300 leading-relaxed">
+                Respaldado por el <strong>Teorema del Límite Central (TLC)</strong>. Al operar con muestras de N = 10,000 y una población de N = 7,728,394 observaciones, la distribución muestral de la media converge con precisión a la distribución normal gaussiana, otorgando robustez al estadístico F.
+              </p>
+            </div>
+
+            <!-- Homocedasticidad Levene -->
+            <div class="bg-slate-900/80 p-4 rounded-xl border border-slate-800">
+              <div class="flex items-center justify-between mb-1">
+                <span class="font-bold text-white text-sm">Prueba de Levene (Homogeneidad de Varianzas)</span>
+                <span class="px-2 py-0.5 rounded bg-amber-950 text-amber-400 border border-amber-800 font-semibold text-[10px]">Heterocedástico</span>
+              </div>
+              <p class="text-slate-300 leading-relaxed mb-2">
+                Evaluación de H0: Las varianzas son homogéneas entre grupos (α = 0.05):
+              </p>
+              <div class="grid grid-cols-2 gap-2 font-mono text-[11px]">
+                <div class="bg-slate-950 p-2 rounded border border-slate-800">
+                  <span class="text-slate-400 block text-[10px]">duration_clean_min</span>
+                  <span class="text-amber-400 font-bold">F = 5.8896</span>
+                  <span class="text-red-400 block text-[10px]">p = 0.000518 &lt; 0.05</span>
+                </div>
+                <div class="bg-slate-950 p-2 rounded border border-slate-800">
+                  <span class="text-slate-400 block text-[10px]">visibility_mi</span>
+                  <span class="text-amber-400 font-bold">F = 7.8478</span>
+                  <span class="text-red-400 block text-[10px]">p = 0.000032 &lt; 0.05</span>
+                </div>
+              </div>
+              <p class="text-slate-400 mt-2 text-[11px]">
+                Las varianzas no son homogéneas. Por ello, se corrobora el análisis con comparaciones múltiples post-hoc de Tukey HSD con ajuste de tasa de error familiar.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ANOVA Results Cards & Table -->
+      <div class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800">
+        <h2 class="text-xl font-bold text-white mb-6 flex items-center space-x-2">
+          <span class="w-8 h-8 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center justify-center font-bold text-sm">F</span>
+          <span>3. Resultados de la Prueba ANOVA F, p-Valores y Tamaño del Efecto</span>
+        </h2>
+
+        <!-- Comparison Table -->
+        <div class="overflow-x-auto mb-8">
+          <table class="w-full text-left text-xs font-sans">
+            <thead class="bg-slate-900 text-slate-300 font-semibold uppercase text-[11px] border-b border-slate-800">
+              <tr>
+                <th class="py-3 px-4">Variable Analizada</th>
+                <th class="py-3 px-4">Estadístico F</th>
+                <th class="py-3 px-4">Valor p</th>
+                <th class="py-3 px-4">Significancia</th>
+                <th class="py-3 px-4">Tamaño Efecto (η²)</th>
+                <th class="py-3 px-4">Decisión Estadística</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-800/80 text-slate-300">
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-4 px-4 font-bold text-white flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-sky-400"></span>
+                  <span>duration_clean_min (Duración)</span>
+                </td>
+                <td class="py-4 px-4 font-mono font-bold text-white">5.8960</td>
+                <td class="py-4 px-4 font-mono text-emerald-400 font-bold">0.0005136543</td>
+                <td class="py-4 px-4"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-semibold">Altamente Significativo (p &lt; 0.001) ⭐⭐⭐</span></td>
+                <td class="py-4 px-4 font-mono">0.001783 (0.18%)</td>
+                <td class="py-4 px-4 font-bold text-emerald-400">Rechazar H0 ✓ (Severidad SI afecta duración)</td>
+              </tr>
+              <tr class="hover:bg-slate-900/40 transition">
+                <td class="py-4 px-4 font-bold text-white flex items-center space-x-2">
+                  <span class="w-2.5 h-2.5 rounded-full bg-indigo-400"></span>
+                  <span>visibility_mi (Visibilidad)</span>
+                </td>
+                <td class="py-4 px-4 font-mono font-bold text-white">11.2288</td>
+                <td class="py-4 px-4 font-mono text-emerald-400 font-bold">0.0000002370</td>
+                <td class="py-4 px-4"><span class="px-2 py-0.5 rounded bg-emerald-950 text-emerald-300 border border-emerald-800 font-semibold">Altamente Significativo (p &lt; 0.001) ⭐⭐⭐</span></td>
+                <td class="py-4 px-4 font-mono">0.003391 (0.34%)</td>
+                <td class="py-4 px-4 font-bold text-emerald-400">Rechazar H0 ✓ (Severidad SI afecta visibilidad)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Post-Hoc Tukey HSD Matrix -->
+        <div class="bg-slate-900/70 p-6 rounded-xl border border-slate-800 mb-8">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-sm font-bold text-white flex items-center space-x-2">
+              <svg class="w-4 h-4 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              <span>Prueba Post-Hoc de Tukey HSD: Comparación Múltiple Pareada</span>
+            </h3>
+            <span class="text-xs text-slate-400">Control de Error Tipo I (α = 0.05)</span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+            <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+              <h4 class="text-sky-400 font-bold mb-2">duration_clean_min (Pares de Severidad)</h4>
+              <ul class="space-y-1.5 text-slate-300">
+                <li class="flex justify-between"><span>Severidad 1 vs 2:</span> <span class="text-slate-400">p = 0.982740 (No sig)</span></li>
+                <li class="flex justify-between"><span>Severidad 1 vs 3:</span> <span class="text-slate-400">p = 0.938716 (No sig)</span></li>
+                <li class="flex justify-between"><span>Severidad 1 vs 4:</span> <span class="text-slate-400">p = 0.999628 (No sig)</span></li>
+                <li class="flex justify-between bg-sky-950/40 px-2 py-1 rounded border border-sky-800/60 font-bold">
+                  <span class="text-sky-300">Severidad 2 vs 3:</span> <span class="text-emerald-400">p = 0.000206 ✓ Significativo</span>
+                </li>
+                <li class="flex justify-between"><span>Severidad 2 vs 4:</span> <span class="text-slate-400">p = 0.956030 (No sig)</span></li>
+                <li class="flex justify-between"><span>Severidad 3 vs 4:</span> <span class="text-slate-400">p = 0.888732 (No sig)</span></li>
+              </ul>
+            </div>
+
+            <div class="bg-slate-950 p-4 rounded-lg border border-slate-800">
+              <h4 class="text-indigo-400 font-bold mb-2">visibility_mi (Pares de Severidad)</h4>
+              <ul class="space-y-1.5 text-slate-300">
+                <li class="flex justify-between"><span>Severidad 1 vs 2:</span> <span class="text-slate-400">p = 0.997276 (No sig)</span></li>
+                <li class="flex justify-between"><span>Severidad 1 vs 3:</span> <span class="text-slate-400">p = 0.999703 (No sig)</span></li>
+                <li class="flex justify-between"><span>Severidad 1 vs 4:</span> <span class="text-slate-400">p = 0.995986 (No sig)</span></li>
+                <li class="flex justify-between bg-indigo-950/40 px-2 py-1 rounded border border-indigo-800/60 font-bold">
+                  <span class="text-indigo-300">Severidad 2 vs 3:</span> <span class="text-emerald-400">p = 0.000000 ✓ Significativo</span>
+                </li>
+                <li class="flex justify-between"><span>Severidad 2 vs 4:</span> <span class="text-slate-400">p = 0.955425 (No sig)</span></li>
+                <li class="flex justify-between"><span>Severidad 3 vs 4:</span> <span class="text-slate-400">p = 0.996039 (No sig)</span></li>
+              </ul>
+            </div>
+          </div>
+          <p class="text-xs text-slate-400 mt-3">
+            <strong>Interpretación Post-Hoc:</strong> El salto analítico más concluyente ocurre entre <strong>Severidad 2 y Severidad 3</strong>, que separa los siniestros cotidianos de arterias urbanas frente a incidentes mayores en autopistas.
+          </p>
+        </div>
+
+        <!-- ANOVA Visualizations Gallery -->
+        <h3 class="text-sm font-bold text-white mb-4 flex items-center space-x-2">
+          <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Visualizaciones Generadas del ANOVA (Grupos de Severidad & Distribución)</span>
+        </h3>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 cursor-pointer group" onclick="openModal('assets/images/grafica_anova_duracion.png', 'ANOVA: Duración por Severidad')">
+            <img src="assets/images/grafica_anova_duracion.png" alt="ANOVA Duración" class="w-full h-auto rounded-lg">
+            <p class="text-xs text-center text-slate-300 font-medium py-2">Duración: Boxplot y Medias con 95% CI</p>
+          </div>
+
+          <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 cursor-pointer group" onclick="openModal('assets/images/grafica_anova_visibilidad.png', 'ANOVA: Visibilidad por Severidad')">
+            <img src="assets/images/grafica_anova_visibilidad.png" alt="ANOVA Visibilidad" class="w-full h-auto rounded-lg">
+            <p class="text-xs text-center text-slate-300 font-medium py-2">Visibilidad: Boxplot y Medias con 95% CI</p>
+          </div>
+
+          <div class="bg-slate-900 p-2 rounded-xl border border-slate-800 cursor-pointer group" onclick="openModal('assets/images/grafica_anova_resumen_estadistico.png', 'Panel Consolidado ANOVA')">
+            <img src="assets/images/grafica_anova_resumen_estadistico.png" alt="ANOVA Panel" class="w-full h-auto rounded-lg">
+            <p class="text-xs text-center text-slate-300 font-medium py-2">Panel Integrado: F-Test, Levene y Tukey</p>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- ======================================================================= -->
+    <!-- SECCIÓN 3: INFOGRAFÍA DEL PROYECTO & GUÍA DE COMANDOS -->
+    <!-- ======================================================================= -->
+    <section id="seccion-infografia" class="tab-content hidden space-y-12">
+
+      <!-- Business Idea & Strategic Vision Banner -->
+      <div class="glass-card rounded-2xl p-6 sm:p-8 border border-sky-900/40 relative overflow-hidden">
+        <div class="absolute -right-10 -bottom-10 w-72 h-72 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div class="space-y-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-sky-950 text-sky-400 border border-sky-800">
+            Arquitectura de Solución & Visión de Negocio
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">
+            Infografía del Pipeline ETL & Arquitectura de Datos
+          </h1>
+          <p class="text-slate-300 text-sm max-w-4xl leading-relaxed">
+            Plataforma integral de ingeniería de datos para la ingesta, limpieza vectorial de alta velocidad, indexación relacional B-Tree y analítica inferencial de accidentes urbanos a escala de <strong>Big Data (7.73 Millones de registros, 3.05 GB de datos crudos)</strong>.
+          </p>
+        </div>
+      </div>
+
+      <!-- Business Idea Card -->
+      <div class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800">
+        <h2 class="text-xl font-bold text-white mb-4 flex items-center space-x-2">
+          <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"/></svg>
+          <span>Idea de Negocio & Propósito Estratégico</span>
+        </h2>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm">
+          <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800">
+            <div class="w-9 h-9 rounded-lg bg-sky-950 text-sky-400 border border-sky-800 flex items-center justify-center font-bold mb-3">01</div>
+            <h3 class="text-white font-bold mb-2">Despacho Predictivo de Emergencias</h3>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Ubicar estratégicamente ambulancias y grúas de remoción pesada en los corredores viales críticos (como la I-95 en Florida o cuadrantes de Los Ángeles) en los horarios pico de 07:00h y 16:00-17:00h para reducir el tiempo de respuesta en un 35%.
+            </p>
+          </div>
+
+          <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800">
+            <div class="w-9 h-9 rounded-lg bg-emerald-950 text-emerald-400 border border-emerald-800 flex items-center justify-center font-bold mb-3">02</div>
+            <h3 class="text-white font-bold mb-2">Atenuación Meteorológica Dinámica</h3>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Implementar señalización de velocidad variable en autopistas ante alertas de lluvia y nieve, donde la tasa de accidentes graves se dispara al 22.76% y la visibilidad desciende por debajo de 3 millas.
+            </p>
+          </div>
+
+          <div class="bg-slate-900/60 p-5 rounded-xl border border-slate-800">
+            <div class="w-9 h-9 rounded-lg bg-indigo-950 text-indigo-400 border border-indigo-800 flex items-center justify-center font-bold mb-3">03</div>
+            <h3 class="text-white font-bold mb-2">Rediseño de Infraestructura Crítica</h3>
+            <p class="text-slate-300 text-xs leading-relaxed">
+              Priorizar auditorías viales en los más de 1.14M de incidentes en semáforos y 873K en cruces peatonales, implementando fases exclusivas de giro a la izquierda y pasos peatonales elevados con iluminación adaptativa.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3-Phase Architecture Breakdown -->
+      <div class="space-y-6">
+        <h2 class="text-xl font-bold text-white flex items-center space-x-2">
+          <svg class="w-5 h-5 text-sky-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>
+          <span>Pipeline ETL: Tecnologías Utilizadas, Justificación & Cómo se Hizo</span>
+        </h2>
+
+        <!-- FASE 1: EXTRACCIÓN -->
+        <div class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800">
+          <div class="flex items-center space-x-3 mb-4">
+            <span class="px-3 py-1 rounded-lg bg-sky-900/50 text-sky-400 border border-sky-700 text-xs font-bold uppercase tracking-wider">Fase 1</span>
+            <h3 class="text-lg font-bold text-white">EXTRACCIÓN (Ingesta en Streaming & PySpark)</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <div class="space-y-3">
+              <h4 class="text-slate-400 font-bold uppercase text-[11px] tracking-wider">Tecnologías Utilizadas:</h4>
+              <ul class="space-y-2 text-slate-300 font-medium">
+                <li class="flex items-start space-x-2">
+                  <span class="text-sky-400 font-bold">•</span>
+                  <span><strong>Python 3.13:</strong> Núcleo de ejecución asíncrona y compatibilidad con typing moderno.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-sky-400 font-bold">•</span>
+                  <span><strong>KaggleHub:</strong> Descarga pública y anónima directa desde la URL oficial de Kaggle sin necesidad de credenciales API manuales, garantizando reproducibilidad total.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-sky-400 font-bold">•</span>
+                  <span><strong>Pandas (motor de streaming por bloques):</strong> Lectura en chunks de 500,000 registros para procesar 3.05 GB con consumo de memoria RAM inferior a 1.2 GB.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-sky-400 font-bold">•</span>
+                  <span><strong>Apache PySpark:</strong> Ingesta distribuida bajo demanda mediante <code class="text-sky-300 font-mono">spark.read.csv()</code> con inferencia tipada de esquema.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
+              <h4 class="text-sky-400 font-bold text-xs uppercase tracking-wider">¿Por qué y Cómo se Hizo?</h4>
+              <p class="text-slate-300 leading-relaxed">
+                <strong>El reto:</strong> El archivo CSV crudo ocupa 3.05 GB en disco y tiene 7.73M de filas. Cargarlo completo en memoria con <code class="text-slate-200 font-mono">pd.read_csv()</code> causaría un desbordamiento de memoria (OOM).<br>
+                <strong>La solución:</strong> Se implementó un generador Python con <code class="text-slate-200 font-mono">yield</code> que itera en bloques de 500,000 filas. Simultáneamente, el conector KaggleHub detecta si el archivo ya fue descargado en caché local, evitando descargas redundantes.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FASE 2: TRANSFORMACIÓN -->
+        <div class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800">
+          <div class="flex items-center space-x-3 mb-4">
+            <span class="px-3 py-1 rounded-lg bg-emerald-900/50 text-emerald-400 border border-emerald-700 text-xs font-bold uppercase tracking-wider">Fase 2</span>
+            <h3 class="text-lg font-bold text-white">TRANSFORMACIÓN (Limpieza Vectorial, RE2 C++ & PySpark)</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <div class="space-y-3">
+              <h4 class="text-slate-400 font-bold uppercase text-[11px] tracking-wider">Tecnologías Utilizadas:</h4>
+              <ul class="space-y-2 text-slate-300 font-medium">
+                <li class="flex items-start space-x-2">
+                  <span class="text-emerald-400 font-bold">•</span>
+                  <span><strong>Python 3.13 & Pandas 2.2+:</strong> Pipeline de funciones puras orientadas a columnas.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-emerald-400 font-bold">•</span>
+                  <span><strong>Apache PyArrow 18+ (Compute RE2):</strong> Motor de expresiones regulares de alto rendimiento compiladas en C++ nativo para clasificar tipos de vehículos (<code class="text-emerald-300 font-mono">pc.match_substring_regex</code>) a más de 500,000 registros por segundo.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-emerald-400 font-bold">•</span>
+                  <span><strong>NumPy (np.select):</strong> Vectorización condicional en memoria contigua C-order para jerarquía vial y franjas horarias sin usar bucles lentos <code class="text-slate-300 font-mono">apply()</code>.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-emerald-400 font-bold">•</span>
+                  <span><strong>Apache PySpark:</strong> Transformaciones equivalentes con funciones nativas de Spark SQL (<code class="text-emerald-300 font-mono">when/otherwise, to_timestamp, regexp_extract</code>).</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
+              <h4 class="text-emerald-400 font-bold text-xs uppercase tracking-wider">¿Por qué y Cómo se Hizo?</h4>
+              <p class="text-slate-300 leading-relaxed">
+                <strong>El reto:</strong> La presencia de 743,166 timestamps con nanosegundos heterogéneos, 10,869 nulos en calle y la necesidad de extraer menciones de vehículos sin confundir toponimias viales.<br>
+                <strong>La solución:</strong> Truncamiento regex a microsegundos estándar ISO-8601, cálculo de duración depurada acotada a $\le 24$ horas (neutralizando 34,981 outliers administrativos) e imputación determinista de cadenas textuales.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- FASE 3: CARGA -->
+        <div class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800">
+          <div class="flex items-center space-x-3 mb-4">
+            <span class="px-3 py-1 rounded-lg bg-indigo-900/50 text-indigo-400 border border-indigo-700 text-xs font-bold uppercase tracking-wider">Fase 3</span>
+            <h3 class="text-lg font-bold text-white">CARGA & ALMACENAMIENTO (Parquet Snappy, SQLite Índices & CSV)</h3>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 text-xs">
+            <div class="space-y-3">
+              <h4 class="text-slate-400 font-bold uppercase text-[11px] tracking-wider">Tecnologías Utilizadas:</h4>
+              <ul class="space-y-2 text-slate-300 font-medium">
+                <li class="flex items-start space-x-2">
+                  <span class="text-indigo-400 font-bold">•</span>
+                  <span><strong>Apache PyArrow 18+ (ParquetWriter Snappy):</strong> Escritura columnar con compresión Snappy por row groups, reduciendo 3.05 GB a tan solo <strong>374 MB</strong> (88% de reducción de almacenamiento).</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-indigo-400 font-bold">•</span>
+                  <span><strong>SQLite 3:</strong> Base relacional con PRAGMAs optimizados (<code class="text-indigo-300 font-mono">synchronous=OFF, journal_mode=MEMORY, cache_size=-256000</code>) y transacción única por bloque, seguida de la creación de 8 índices analíticos B-Tree.</span>
+                </li>
+                <li class="flex items-start space-x-2">
+                  <span class="text-indigo-400 font-bold">•</span>
+                  <span><strong>Python Standard Library (json, time, os, shutil):</strong> Serialización de métricas de auditoría en <code class="text-slate-300 font-mono">00_etl_audit.json</code> y persistencia del CSV limpio final por streaming.</span>
+                </li>
+              </ul>
+            </div>
+
+            <div class="bg-slate-900/60 p-4 rounded-xl border border-slate-800 space-y-2">
+              <h4 class="text-indigo-400 font-bold text-xs uppercase tracking-wider">¿Por qué y Cómo se Hizo?</h4>
+              <p class="text-slate-300 leading-relaxed">
+                <strong>El reto:</strong> Realizar 7.73 millones de inserciones en SQLite normalmente tomaría más de 3 horas si se utiliza configuración por defecto con fsync en cada fila.<br>
+                <strong>La solución:</strong> Con PRAGMAs síncronos en memoria y escritura transaccional por bloques, la carga completa tomó solo <strong>788 segundos (~13 minutos)</strong>, dejando la base relacional lista para responder consultas SQL analíticas de alto rendimiento.
+              </p>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Command Execution Guide -->
+      <div class="glass-card rounded-2xl p-6 sm:p-8 border border-slate-800">
+        <h2 class="text-xl font-bold text-white mb-2 flex items-center space-x-2">
+          <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l3 3-3 3m5 0h3M5 20h14a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+          <span>Guía de Comandos para Correr el Proyecto Paso a Paso</span>
+        </h2>
+        <p class="text-slate-400 text-xs mb-6">
+          Comandos oficiales para activar el entorno virtual, probar cada módulo de forma aislada, ejecutar el ETL orquestado y correr las consultas analíticas.
+        </p>
+
+        <div class="space-y-4">
+
+          <!-- Paso 0: Activar entorno -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white uppercase tracking-wider">0. Activar Entorno Virtual (.venv)</span>
+              <button onclick="copyCommand('cmd-act-ps')" class="text-[11px] text-sky-400 hover:text-white transition flex items-center space-x-1">
+                <span>Copiar</span>
+              </button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Para PowerShell (Windows):</p>
+            <pre class="font-mono text-xs text-emerald-300 bg-slate-900/80 p-2.5 rounded-lg mb-2 overflow-x-auto"><code id="cmd-act-ps">.\.venv\Scripts\Activate.ps1</code></pre>
+            <p class="text-[11px] text-slate-400 mb-2">Para Command Prompt (CMD):</p>
+            <pre class="font-mono text-xs text-emerald-300 bg-slate-900/80 p-2.5 rounded-lg overflow-x-auto"><code id="cmd-act-cmd">.\.venv\Scripts\activate.bat</code></pre>
+          </div>
+
+          <!-- Paso 1: Extracción -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white uppercase tracking-wider">Paso 1: Probar el Módulo de Extracción</span>
+              <button onclick="copyCommand('cmd-p1')" class="text-[11px] text-sky-400 hover:text-white transition">Copiar</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Verifica la descarga desde Kaggle y el streaming del primer bloque:</p>
+            <pre class="font-mono text-xs text-sky-300 bg-slate-900/80 p-2.5 rounded-lg overflow-x-auto"><code id="cmd-p1">python extraccion/extractor.py</code></pre>
+          </div>
+
+          <!-- Paso 2: Transformación -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white uppercase tracking-wider">Paso 2: Probar el Módulo de Transformación</span>
+              <button onclick="copyCommand('cmd-p2')" class="text-[11px] text-sky-400 hover:text-white transition">Copiar</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Valida la limpieza vectorial, normalización de timestamps y regex NLP de vehículos:</p>
+            <pre class="font-mono text-xs text-sky-300 bg-slate-900/80 p-2.5 rounded-lg overflow-x-auto"><code id="cmd-p2">python transformacion/transformador.py</code></pre>
+          </div>
+
+          <!-- Paso 3: Carga -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white uppercase tracking-wider">Paso 3: Probar el Módulo de Carga</span>
+              <button onclick="copyCommand('cmd-p3')" class="text-[11px] text-sky-400 hover:text-white transition">Copiar</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Valida la estructura de almacenamiento Parquet, esquema DDL de SQLite y auditoría:</p>
+            <pre class="font-mono text-xs text-sky-300 bg-slate-900/80 p-2.5 rounded-lg overflow-x-auto"><code id="cmd-p3">python carga/cargador.py</code></pre>
+          </div>
+
+          <!-- Paso 4: Pipeline Completo -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white uppercase tracking-wider">Paso 4: Ejecutar el Pipeline ETL Completo</span>
+              <button onclick="copyCommand('cmd-p4')" class="text-[11px] text-sky-400 hover:text-white transition">Copiar</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Corre todo el flujo: Extracción → Transformación → Carga Parquet / SQLite → 8 Índices B-Tree → Exportación CSV Limpio:</p>
+            <pre class="font-mono text-xs text-emerald-300 bg-slate-900/80 p-2.5 rounded-lg overflow-x-auto"><code id="cmd-p4">python ejecutar_etl.py --modo etl</code></pre>
+          </div>
+
+          <!-- Paso 5: Consultas Analíticas -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-white uppercase tracking-wider">Paso 5: Ejecutar Consultas SQL Analíticas (10 Preguntas)</span>
+              <button onclick="copyCommand('cmd-p5')" class="text-[11px] text-sky-400 hover:text-white transition">Copiar</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Para ver todas las 10 preguntas y sus tablas de resultados formateadas:</p>
+            <pre class="font-mono text-xs text-sky-300 bg-slate-900/80 p-2.5 rounded-lg mb-2 overflow-x-auto"><code id="cmd-p5">python ejecutar_etl.py</code></pre>
+            
+            <p class="text-[11px] text-slate-400 mb-2">Para ejecutar una pregunta específica individualmente (del 1 al 10):</p>
+            <pre class="font-mono text-xs text-sky-300 bg-slate-900/80 p-2.5 rounded-lg overflow-x-auto"><code id="cmd-p5-ind">python ejecutar_etl.py --pregunta 1</code></pre>
+          </div>
+
+          <!-- Comandos Adicionales -->
+          <div class="bg-slate-950 p-4 rounded-xl border border-slate-800">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold text-amber-400 uppercase tracking-wider">Comandos Adicionales: ANOVA y Generación de Gráficas</span>
+              <button onclick="copyCommand('cmd-anova')" class="text-[11px] text-sky-400 hover:text-white transition">Copiar</button>
+            </div>
+            <p class="text-[11px] text-slate-400 mb-2">Correr el script de ANOVA inferencial (prueba F, Levene, Tukey HSD):</p>
+            <pre class="font-mono text-xs text-amber-300 bg-slate-900/80 p-2.5 rounded-lg mb-2 overflow-x-auto"><code id="cmd-anova">python ANOVA/analisis_anova.py</code></pre>
+
+            <p class="text-[11px] text-slate-400 mb-2">Regenerar todas las 10 gráficas SQL en alta resolución:</p>
+            <pre class="font-mono text-xs text-amber-300 bg-slate-900/80 p-2.5 rounded-lg overflow-x-auto"><code id="cmd-graficas">python "graficas sql\generar_graficas.py"</code></pre>
+          </div>
+
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <!-- ========================================================================= -->
+  <!-- LIGHTBOX IMAGE MODAL -->
+  <!-- ========================================================================= -->
+  <div id="image-modal" class="fixed inset-0 z-50 bg-black/90 backdrop-blur-md hidden items-center justify-center p-4" onclick="closeModal()">
+    <div class="relative max-w-6xl w-full bg-slate-900 rounded-2xl p-4 border border-slate-800 shadow-2xl" onclick="event.stopPropagation()">
+      <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800">
+        <h3 id="modal-title" class="text-sm font-bold text-white tracking-wide">Visor de Gráfica</h3>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-slate-800 transition">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <div class="max-h-[80vh] overflow-auto flex items-center justify-center">
+        <img id="modal-img" src="" alt="Gráfica ampliada" class="max-h-[75vh] w-auto rounded-lg object-contain">
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification -->
+  <div id="toast" class="fixed bottom-6 right-6 z-50 bg-sky-600 text-white text-xs font-semibold px-4 py-2.5 rounded-xl shadow-2xl transition transform translate-y-20 opacity-0 pointer-events-none flex items-center space-x-2">
+    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>
+    <span id="toast-msg">Comando copiado al portapapeles</span>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- JAVASCRIPT CONTROLLERS -->
+  <!-- ========================================================================= -->
+  <script>
+    // Tab Controller
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetSection = document.getElementById(tabId);
+      const targetBtn = document.getElementById('tab-' + tabId);
+
+      if (targetSection) targetSection.classList.remove('hidden');
+      if (targetBtn) targetBtn.classList.add('active');
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    // Question Quick Scroll
+    function scrollToQuestion(qId) {
+      const el = document.getElementById(qId);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+
+    // Modal Controller
+    function openModal(imgSrc, title) {
+      const modal = document.getElementById('image-modal');
+      const modalImg = document.getElementById('modal-img');
+      const modalTitle = document.getElementById('modal-title');
+      
+      modalImg.src = imgSrc;
+      modalTitle.textContent = title;
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeModal() {
+      const modal = document.getElementById('image-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    // Escape key closes modal
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    // Copy Command to Clipboard
+    function copyCommand(elementId) {
+      const text = document.getElementById(elementId).innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        showToast('Comando copiado: ' + text);
+      }).catch(err => {
+        showToast('Comando copiado');
+      });
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById('toast');
+      const toastMsg = document.getElementById('toast-msg');
+      toastMsg.textContent = msg;
+      toast.classList.remove('translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+      setTimeout(() => {
+        toast.classList.add('translate-y-20', 'opacity-0');
+        toast.classList.remove('translate-y-0', 'opacity-100');
+      }, 2500);
+    }
+  </script>
+
+</body>
+</html>
